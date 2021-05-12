@@ -1,0 +1,19 @@
+html
+{
+	font-size: 14px;
+}
+
+table
+{
+	td:first-child
+	{
+		font-weight: bold;
+		padding-right: 10px;
+	}
+}
+
+span.spacer
+{
+	display: inline-block;
+	width: 10px; 
+}
