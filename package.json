@@ -9,6 +9,7 @@
     "@types/react": "^17.0.6",
     "@types/react-dom": "^17.0.5",
     "hookrouter": "^1.2.5",
+    "include-media": "^1.4.10",
     "node-sass": "^6.0.0",
     "react": "^17.0.2",
     "react-async": "^10.0.1",

@@ -7,6 +7,7 @@ function Home()
 	const html =
 	(
 		<main className="home">
+			<img className="logo" src="./nervos-white.png" alt="Nervos Logo" />
 			<p>
 				CKB.tools is a online collection of free development tools for use with <a href="https://nervos.org/" target="_blank" rel="noreferrer">Nervos Network</a>.
 			</p>
