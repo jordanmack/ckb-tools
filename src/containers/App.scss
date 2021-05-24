@@ -1,0 +1,66 @@
+@import '../common/scss/variables.scss';
+
+section.main
+{
+	position: relative;
+}
+
+main
+{
+	padding: $padding-thick*2 $padding-default $padding-thick*2 $padding-default;
+	margin: 0 auto 0 auto;
+	max-width: map-get($breakpoints, "desktop");
+	width: 100%;
+}
+
+span.spacer
+{
+	display: inline-block;
+	width: $margin-default;
+}
+
+.loading-spinner
+{
+	position: absolute;
+	height: 50px;
+	right: 0px;
+	top: 0;
+}
+
+.reOverlay .reOverlay__modalWrapper .reOverlay__modalContainer
+{
+	background: black;
+	border: 1px solid #cccccc;
+	border-radius: $border-radius-default;
+	padding: $padding-default;
+	max-width: 500px;
+	width: 100%;
+
+	h1, h2, h3
+	{
+		margin-bottom: 1em;
+	}
+
+	p
+	{
+		// line-height: 1em;
+	}
+
+	.button-bar
+	{
+		margin-top: $margin-thick;
+		text-align: center;
+	}
+
+	label
+	{
+		display: block;
+		font-size: 0.8rem;
+	}
+
+	input
+	{
+		display: block;
+		width: 100%;
+	}
+}

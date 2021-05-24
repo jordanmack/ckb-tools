@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteBase "/"
+RewriteRule "^[^.]+$" "/favicon.png" [END]

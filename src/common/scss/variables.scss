@@ -1,0 +1,38 @@
+// Global
+$border-radius-default: 10px;
+$border-radius-input: 5px;
+$font-family-default: "Open Sans";
+$font-family-monospace: "Courier New", "Lucida Console";
+$font-size-default: 14px;
+$margin-default: 10px;
+$margin-button: 4px;
+$margin-thick: $margin-default * 2;
+$margin-thin: $margin-default / 2;
+$padding-default: 10px;
+$padding-cell: 2px;
+$padding-thick: $padding-default * 2;
+$padding-thin: $padding-default / 2;
+$padding-input: 8px;
+
+// Base Colors
+$color-nervos-green: #00cc9b;
+
+// Component Colors
+$color-background-default: #333333;
+$color-button-default: $color-nervos-green;
+$color-button-hover: darken($color-button-default, 10%);
+$color-button-disabled: adjust-color($color-button-default, $saturation: -100%, $lightness: -10%, $alpha: -0.4);
+$color-font-default: #dddddd;
+$color-font-light: #ffffff;
+$color-font-disabled: rgba($color-font-light, 0.2);
+
+// Sizes
+
+// Z-Index
+
+// Transitions
+$transition-duration-text: 0.2s;
+$transition-duration-default: 0.3s;
+
+// Sizing for Media Queries (npm include-media)
+$breakpoints: (mobile: 375px, tablet: 768px, desktop: 1024px, highres: 1366px, r720p: 1280px, r1080p: 1920px);

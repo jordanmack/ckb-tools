@@ -1,0 +1,29 @@
+@import '../../common/scss/variables.scss';
+
+main.sudt
+{
+	position: relative;
+
+	table
+	{
+		td
+		{
+			padding: $padding-cell $padding-default $padding-cell 0;
+
+			&:first-child
+			{
+				font-weight: bold;
+			}
+
+			&:last-child
+			{
+				padding-right: 0;
+			}
+		}
+
+		&.loading
+		{
+			color: $color-font-disabled;
+		}
+	}
+}

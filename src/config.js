@@ -1,7 +1,8 @@
 const config =
 {
-	ckb_rpc_url: "//rpc-testnet.ckb.tools",
-	ckb_indexer_url: "//indexer-testnet.ckb.tools"
+	ckbRpcUrl: "//rpc-testnet.ckb.tools",
+	ckbIndexerUrl: "//indexer-testnet.ckb.tools",
+	ckbExplorerUrl: "https://explorer.nervos.org/aggron/"
 };
 
 export default config;
