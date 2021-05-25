@@ -250,7 +250,7 @@ function App()
 						To create a second token, switch to a different account in MetaMask.
 					</p>
 					<p>
-						Note: If you get errors, wait a few minutes for all existing transactions to confirm.
+						Note: If you need Testnet CKBytes you can request some from the <a href="https://faucet.nervos.org/" target="_blank" rel="noreferrer">Testnet Faucet</a>.
 					</p>
 					<table className={(loading) ? 'loading' : ''}>
 						<tbody>
