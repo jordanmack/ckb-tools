@@ -17,8 +17,8 @@ html
 
 body
 {
-	background: $color-background-default;
 	background: url('../../static/nervos-shapes-bg.gif') no-repeat center center fixed; 
+	background-color: $color-background-default;
 	background-size: cover;
 }
 

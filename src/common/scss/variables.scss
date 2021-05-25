@@ -18,7 +18,7 @@ $padding-input: 8px;
 $color-nervos-green: #00cc9b;
 
 // Component Colors
-$color-background-default: #333333;
+$color-background-default: #151515;
 $color-button-default: $color-nervos-green;
 $color-button-hover: darken($color-button-default, 10%);
 $color-button-disabled: adjust-color($color-button-default, $saturation: -100%, $lightness: -10%, $alpha: -0.4);
