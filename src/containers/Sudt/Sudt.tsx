@@ -294,7 +294,7 @@ function App()
 	else if(pwError)
 	{
 		toast.error("An error occurred during loading. Please view the console for details.");
-		throw new Error(pwError.message);
+		console.error(pwError);
 	}
 
 	return html;
