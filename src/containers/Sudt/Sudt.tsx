@@ -259,6 +259,7 @@ function generateTransactionRows(transactions: TransactionTracker[])
 
 async function updateTransactionMonitor(pw: pwObject, transactions: TransactionTracker[], setTransactions: React.Dispatch<any>)
 {
+	// Get the current time.
 	const time = new Date().getTime();
 	
 	// Sort by the last updated time.
@@ -268,6 +269,7 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 		// If transaction is pending and needs to be updated.
 		if(transaction.status === TransactionStatus.Pending && transaction.updated <= time - Config.sudtTransactionMonitorUpdateDelay)
 		{
+			// Try and catch is used here to suppress errors because status updates are a non-essential background process.
 			try
 			{
 				// Retrieve the status from the RPC.
@@ -280,15 +282,18 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 				// Update the transaction update time.
 				newTransactions[i].updated = time;
 
-				// If a valid status was returned and it is committed.
-				if(status === "committed")
+				// Check if status is committed.
+				if(status === 'committed')
 					newTransactions[i].status = TransactionStatus.Confirmed;
+
 				// Check if failure time has passed.
 				else if(transaction.timestamp < time - Config.sudtTransactionMonitorFailureDelay)
 					newTransactions[i].status = TransactionStatus.Failed;
 
-				// Update transactions.
+				// Resort by timestamp so they show up in the order they were added.
 				const resortedTransactions = _.sortBy(newTransactions, 'timestamp');
+
+				// Update transactions.
 				setTransactions(resortedTransactions);
 			}
 			catch(e)
@@ -316,12 +321,6 @@ function App()
 		setBusy(false);
 		setLoading(false);
 	};
-
-	// const handleTransfer = () =>
-	// {
-	// 	setBusy(true);
-	// 	getBalances(pw!.collector, pw!.provider, {callback: updateData});
-	// };
 
 	const addTransaction = (txId: string) =>
 	{
@@ -399,7 +398,7 @@ function App()
 							<tr>
 								<td>CKB Balance:</td>
 								<td>
-									{(!loading) ? Number(data!.capacity.toString(AmountUnit.ckb)).toLocaleString() + " CKBytes" : '...'}
+									{(!loading) ? Number(data!.capacity.toString(AmountUnit.ckb)).toLocaleString() + ' CKBytes' : '...'}
 								</td>
 							</tr>
 							<tr>
@@ -408,7 +407,7 @@ function App()
 							</tr>
 							<tr>
 								<td>SUDT Balance:</td>
-								<td>{(!loading) ? data!.sudtBalance.toString(0) + " Tokens" : '...'}</td>
+								<td>{(!loading) ? data!.sudtBalance.toString(0) + ' Tokens' : '...'}</td>
 							</tr>
 						</tbody>
 					</table>
