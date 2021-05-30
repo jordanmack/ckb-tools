@@ -19,6 +19,7 @@ $color-nervos-green: #00cc9b;
 
 // Component Colors
 $color-background-default: #151515;
+$color-border-default: #cccccc;
 $color-button-default: $color-nervos-green;
 $color-button-hover: darken($color-button-default, 10%);
 $color-button-disabled: adjust-color($color-button-default, $saturation: -100%, $lightness: -10%, $alpha: -0.4);

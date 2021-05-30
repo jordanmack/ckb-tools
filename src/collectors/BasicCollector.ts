@@ -1,4 +1,5 @@
 import {Address, Amount, AmountUnit, Cell, Collector, CollectorOptions, OutPoint, Script, SUDT} from '@lay2/pw-core';
+import * as _ from 'lodash';
 
 export default class BasicCollector extends Collector
 {
@@ -15,7 +16,7 @@ export default class BasicCollector extends Collector
 	{
 		this.cells = [];
 		const indexerQuery = {
-			id: 2,
+			id: _.random(1_000_000),
 			jsonrpc: "2.0",
 			method: "get_cells",
 			params: [
@@ -58,6 +59,7 @@ export default class BasicCollector extends Collector
 		}
 		if (amountTotal.lt(neededAmount))
 			throw new Error(`Could not find enough input capacity. Needed ${neededAmount.toString(AmountUnit.ckb)}, found ${amountTotal.toString(AmountUnit.ckb)}.`);
+
 		return this.cells;
 	}
 
@@ -69,7 +71,7 @@ export default class BasicCollector extends Collector
 
 		const indexerQuery =
 		{
-			id: 2,
+			id: _.random(1_000_000),
 			jsonrpc: "2.0",
 			method: "get_cells",
 			params: [
@@ -118,6 +120,7 @@ export default class BasicCollector extends Collector
 		}
 		if (amountSUDTTotal.lt(neededAmount))
 			throw new Error(`Could not find enough input SUDT cells. Needed ${neededAmount.toString(0)}, found ${amountSUDTTotal.toString(0)}.`);
+
 		return this.cells;
 	}
 
@@ -125,7 +128,7 @@ export default class BasicCollector extends Collector
 	{
 		this.cells = [];
 		const indexerQuery = {
-			id: 2,
+			id: _.random(1_000_000),
 			jsonrpc: "2.0",
 			method: "get_cells",
 			params: [
@@ -158,6 +161,7 @@ export default class BasicCollector extends Collector
 			const cell = new Cell(amount, lockScript, typeScript, outPoint, outputData);
 			this.cells.push(cell);
 		}
+
 		return this.cells;
 	}
 
@@ -190,6 +194,7 @@ export default class BasicCollector extends Collector
 				balance = balance.add(amount);
 			}
 		}
+
 		return balance;
 	}
 
@@ -199,6 +204,7 @@ export default class BasicCollector extends Collector
 		if(options.withData) {
 			return cells.filter((c) => !c.isEmpty() && !c.type);
 		}
+
 		return cells.filter((c) => c.isEmpty() && !c.type);
 	}
 }

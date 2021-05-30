@@ -6,6 +6,11 @@ main.sudt
 
 	table
 	{
+		&.loading
+		{
+			color: $color-font-disabled;
+		}
+
 		td
 		{
 			padding: $padding-cell $padding-default $padding-cell 0;
@@ -21,10 +26,35 @@ main.sudt
 				padding-right: 0;
 			}
 		}
+	}
 
-		&.loading
+	.transactions
+	{
+		display: none;
+
+		&.visible
 		{
-			color: $color-font-disabled;
+			display: block;
+		}
+
+		table
+		{
+			width: 100%;
+			
+			td, th
+			{
+				padding: 2px 10px 2px 0;
+
+				&:nth-child(2)
+				{
+					width: 100px;
+				}
+			}
+
+			td
+			{
+				font-family: $font-family-monospace;
+			}
 		}
 	}
 }

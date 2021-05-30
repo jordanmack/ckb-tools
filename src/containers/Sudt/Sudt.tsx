@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {useAsync} from 'react-async';
 import PWCore, {Address, AddressType, Amount, AmountUnit, Collector, EthProvider, Provider, SUDT} from '@lay2/pw-core';
-import {toast} from "react-toastify";
+import {toast} from 'react-toastify';
 import {Reoverlay} from 'reoverlay';
+import * as _ from 'lodash';
 
 import Config from '../../config.js';
 import BasicCollector from '../../collectors/BasicCollector';
@@ -14,6 +15,8 @@ import SudtMintBuilder from '../../builders/SudtMintBuilder';
 import Utils from '../../common/ts/Utils';
 import './Sudt.scss';
 
+let transactionMonitorTimer: NodeJS.Timeout | null = null;
+
 interface pwObject
 {
 	collector: Collector,
@@ -21,14 +24,36 @@ interface pwObject
 	provider: Provider,
 }
 
+interface DataType
+{
+	address: Address,
+	capacity: Amount,
+	sudtBalance: Amount,
+}
+
 interface getBalancesOptions
 {
 	callback?: React.Dispatch<any>
 }
 
-async function getBalances(collector: BasicCollector, provider: Provider, options?: getBalancesOptions)
+enum TransactionStatus
 {
+	Pending,
+	Confirmed,
+	Failed
+}
 
+interface TransactionTracker
+{
+	txId: string,
+	timestamp: number,
+	updated: number,
+	status: TransactionStatus
+}
+
+const getBalances = _.debounce(getBalancesReal, Config.defaultDebouceDelay);
+async function getBalancesReal(collector: BasicCollector, provider: Provider, options?: getBalancesOptions)
+{
 	const address = new Address(provider.address.addressString, AddressType.eth);
 	const capacity = await collector.getBalance(address);
 	const sudtBalance = await collector.getSUDTBalance(new SUDT(provider.address.toLockScript().toHash()), provider.address);
@@ -45,28 +70,32 @@ async function mintSudt(pw: pwObject, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
 	const collector = new BasicCollector(Config.ckbIndexerUrl);
-	const fee = new Amount("10000", AmountUnit.shannon);
+	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtMintBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
 	const transaction = await builder.build();
 	console.info(transaction);
 
-	const tx_id = await pw.pwCore.sendTransaction(transaction);
-	console.log(`Transaction submitted: ${tx_id}`);
+	const txId = await pw.pwCore.sendTransaction(transaction);
+	console.log(`Transaction submitted: ${txId}`);
+
+	return txId;
 }
 
 async function burnSudt(pw: pwObject, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
 	const collector = new BasicCollector(Config.ckbIndexerUrl);
-	const fee = new Amount("10000", AmountUnit.shannon);
+	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtBurnBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
 	const transaction = await builder.build();
 	console.info(transaction);
 
-	const tx_id = await pw.pwCore.sendTransaction(transaction);
-	console.log(`Transaction submitted: ${tx_id}`);
+	const txId = await pw.pwCore.sendTransaction(transaction);
+	console.log(`Transaction submitted: ${txId}`);
+
+	return txId;
 }
 
 async function initPwCore()
@@ -78,55 +107,56 @@ async function initPwCore()
 	return {pwCore, provider, collector};
 }
 
-function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: React.Dispatch<any>})
+function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
 {
 	return function(e: React.SyntheticEvent): boolean
 	{
 		e.preventDefault();
 	
-		const address = new Address((document.getElementById("burn-token-form")!.getElementsByClassName("address")[0] as HTMLInputElement)!.value, AddressType.ckb);
+		const address = new Address((document.getElementById('burn-token-form')!.getElementsByClassName('address')[0] as HTMLInputElement)!.value, AddressType.ckb);
 		if(!address.valid())
 		{
-			toast.error("An invalid CKB address was provided.");
+			toast.error('An invalid CKB address was provided.');
 			return false;
 		}
 	
 		let amount;
 		try
 		{
-			amount = new Amount((document.getElementById("burn-token-form")!.getElementsByClassName("amount")[0] as HTMLInputElement)!.value, 0);
+			amount = new Amount((document.getElementById('burn-token-form')!.getElementsByClassName('amount')[0] as HTMLInputElement)!.value, 0);
 			if(amount.lte(Amount.ZERO))
 			{
-				toast.error("A valid token amount must be an integer greater than 0.");
+				toast.error('A valid token amount must be an integer greater than 0.');
 				return false;
 			}	
 		}
 		catch(e)
 		{
-			toast.error("An invalid token amount was provided.");
+			toast.error('An invalid token amount was provided.');
 			return false;
 		}
 
 		if(amount.gt(sudtBalance))
 		{
-			toast.error("You cannot burn more SUDT tokens than you own.");
+			toast.error('You cannot burn more SUDT tokens than you own.');
 			return false;
 		}
 
 		burnSudt(pw, address, amount)
-		.then(()=>
+		.then((txId)=>
 		{
-			toast.success("Transaction has been sent to the network.");
+			options?.addTransaction?.(txId);
+			toast.success('Transaction has been sent to the network.');
 		})
 		.catch((e)=>
 		{
 			const error = Utils.decodeError(e);
 			if(!!error && error?.json?.code === -1107)
-				toast.error("A duplicate transaction was detected. Please wait a minute before resubmitting.");
+				toast.error('A duplicate transaction was detected. Please wait a minute before resubmitting.');
 			else if(e?.code === 4001)
 				toast.error(e?.message);
 			else
-				toast.error("An error occurred while sending the transaction. Please view the console for details.", error?.json?.code);
+				toast.error('An error occurred while sending the transaction. Please view the console for details.', error?.json?.code);
 
 			console.error(e);
 			return false;
@@ -136,50 +166,51 @@ function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: R
 	}
 }
 
-function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>})
+function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
 {
 	return function(e: React.SyntheticEvent): boolean
 	{
 		e.preventDefault();
 	
-		const address = new Address((document.getElementById("mint-token-form")!.getElementsByClassName("address")[0] as HTMLInputElement)!.value, AddressType.ckb);
+		const address = new Address((document.getElementById('mint-token-form')!.getElementsByClassName('address')[0] as HTMLInputElement)!.value, AddressType.ckb);
 		if(!address.valid())
 		{
-			toast.error("An invalid CKB address was provided.");
+			toast.error('An invalid CKB address was provided.');
 			return false;
 		}
 	
 		let amount;
 		try
 		{
-			amount = new Amount((document.getElementById("mint-token-form")!.getElementsByClassName("amount")[0] as HTMLInputElement)!.value, 0);
+			amount = new Amount((document.getElementById('mint-token-form')!.getElementsByClassName('amount')[0] as HTMLInputElement)!.value, 0);
 			if(amount.lte(Amount.ZERO))
 			{
-				toast.error("A valid token amount must be an integer greater than 0.");
+				toast.error('A valid token amount must be an integer greater than 0.');
 				return false;
 			}	
 		}
 		catch(e)
 		{
-			toast.error("An invalid token amount was provided.");
+			toast.error('An invalid token amount was provided.');
 			return false;
 		}
 	
 		options?.setBusy?.(true);
 		mintSudt(pw, address, amount)
-		.then(()=>
+		.then((txId)=>
 		{
-			toast.success("Transaction has been sent to the network.");
+			options?.addTransaction?.(txId);
+			toast.success('Transaction has been sent to the network.');
 		})
 		.catch((e)=>
 		{
 			const error = Utils.decodeError(e);
 			if(!!error && error?.json?.code === -1107)
-				toast.error("A duplicate transaction was detected. Please wait a minute before resubmitting.");
+				toast.error('A duplicate transaction was detected. Please wait a minute before resubmitting.');
 			else if(e?.code === 4001)
 				toast.error(e?.message);
 			else
-				toast.error("An error occurred while sending the transaction. Please view the console for details.", error?.json?.code);
+				toast.error('An error occurred while sending the transaction. Please view the console for details.', error?.json?.code);
 
 			console.error(e);
 			return false;
@@ -193,11 +224,80 @@ function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>})
 	}
 }
 
-interface DataType
+function generateTransactionRows(transactions: TransactionTracker[])
 {
-	address: Address,
-	capacity: Amount,
-	sudtBalance: Amount,
+	const rows = [];
+
+	for(const [i, transaction] of transactions.entries())
+	{
+		const explorerLink = (Config.ckbExplorerUrl) ? <a href={Config.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{transaction.txId}</a> : transaction.txId;
+
+		let transactionStatus;
+		if(transaction.status === TransactionStatus.Pending)
+			transactionStatus = <span title="The transaction is waiting for confirmation.">Pending</span>;
+		else if(transaction.status === TransactionStatus.Confirmed)
+			transactionStatus = <span title="The transaction has been confirmed.">Confirmed</span>;
+		else if(transaction.status === TransactionStatus.Failed)
+			transactionStatus = <span title="The transaction did not confirm in the expected timeframe.">Failed</span>;
+		else
+			transactionStatus = <span>Unknown</span>;
+
+		const row = 
+		(
+			<tr key={i}>
+				<td>{explorerLink}</td>
+				<td>{transactionStatus}</td>
+			</tr>
+		);
+		rows.push(row);
+	}
+
+	return rows;
+}
+
+async function updateTransactionMonitor(pw: pwObject, transactions: TransactionTracker[], setTransactions: React.Dispatch<any>)
+{
+	const time = new Date().getTime();
+	
+	// Sort by the last updated time.
+	const sortedTransactions = _.sortBy(transactions, 'updated');
+	for(const [i, transaction] of sortedTransactions.entries())
+	{
+		// If transaction is pending and needs to be updated.
+		if(transaction.status === TransactionStatus.Pending && transaction.updated <= time - Config.sudtTransactionMonitorUpdateDelay)
+		{
+			try
+			{
+				// Retrieve the status from the RPC.
+				const txData = await pw.pwCore.rpc.get_transaction(transaction.txId);
+				const status = txData?.tx_status?.status;
+
+				// Create a new transaction structure to update.
+				const newTransactions = _.cloneDeep(sortedTransactions);
+
+				// Update the transaction update time.
+				newTransactions[i].updated = time;
+
+				// If a valid status was returned and it is committed.
+				if(status === "committed")
+					newTransactions[i].status = TransactionStatus.Confirmed;
+				// Check if failure time has passed.
+				else if(transaction.timestamp < time - Config.sudtTransactionMonitorFailureDelay)
+					newTransactions[i].status = TransactionStatus.Failed;
+
+				// Update transactions.
+				const resortedTransactions = _.sortBy(newTransactions, 'timestamp');
+				setTransactions(resortedTransactions);
+			}
+			catch(e)
+			{
+				console.error(e);
+			}
+
+			// Only process the first found entry per cycle.
+			break;
+		}
+	}
 }
 
 function App()
@@ -205,6 +305,7 @@ function App()
 	const [busy, setBusy] = useState(true);
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<DataType|null>(null);
+	const [transactions, setTransactions] = useState<TransactionTracker[]>([]);
 	const {data: pw, error: pwError} = useAsync(initPwCore);
 
 	const updateData = (newData: any) =>
@@ -220,19 +321,50 @@ function App()
 	// 	getBalances(pw!.collector, pw!.provider, {callback: updateData});
 	// };
 
+	const addTransaction = (txId: string) =>
+	{
+		const tx =
+		{
+			txId,
+			timestamp: new Date().getTime(),
+			updated: new Date().getTime(),
+			status: TransactionStatus.Pending
+		};
+
+		const newTransactions = _.cloneDeep(transactions);
+		newTransactions.push(tx);
+
+		setTransactions(newTransactions);
+	};
+
 	const handleMint = () =>
 	{
-		const onConfirm = onMintConfirm(pw!, {setBusy});
+		const onConfirm = onMintConfirm(pw!, {setBusy, addTransaction});
 		Reoverlay.showModal(MintModal, {defaultAddress: pw!.provider.address.toCKBAddress(), defaultAmount: 0, onConfirm});
 	};
 
 	const handleBurn = () =>
 	{
-		const onConfirm = onBurnConfirm(pw!, data!.sudtBalance, {setBusy});
+		const onConfirm = onBurnConfirm(pw!, data!.sudtBalance, {setBusy, addTransaction});
 		Reoverlay.showModal(BurnModal, {defaultAddress: pw!.provider.address.toCKBAddress(), defaultAmount: 0, onConfirm});
 	};
 
 	useEffect(()=>{if(pw){getBalances(pw!.collector, pw!.provider, {callback: updateData});}}, [pw]);
+	useEffect(()=>
+	{
+		if(pw)
+		{
+			if(transactionMonitorTimer)
+				clearInterval(transactionMonitorTimer);
+
+			transactionMonitorTimer = setInterval(() =>
+			{
+				updateTransactionMonitor(pw, transactions, setTransactions);
+			}, Config.sudtTransactionMonitorDelay);
+
+			getBalances(pw!.collector, pw!.provider, {callback: updateData});
+		}
+	}, [pw, transactions]);
 
 	let html = <main></main>;
 	if(!pwError)
@@ -286,6 +418,22 @@ function App()
 						{/* <span className="spacer" /> */}
 						{/* <button className={(loading) ? 'loading' : ''} disabled={busy} onClick={()=>handleTransfer()}>Transfer Tokens</button> */}
 					</div>
+					<br />
+					<br />
+					<div className={(transactions.length!==0) ? 'transactions visible' : 'transactions'}>
+						{/* <h2>Transactions</h2> */}
+						<table>
+							<thead>
+								<tr>
+									<th>Transaction ID</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								{generateTransactionRows(transactions)}
+							</tbody>
+						</table>
+					</div>
 				</main>
 				{loading && <LoadingSpinner />}
 			</>
@@ -293,7 +441,7 @@ function App()
 	}
 	else if(pwError)
 	{
-		toast.error("An error occurred during loading. Please view the console for details.");
+		toast.error('An error occurred during loading. Please view the console for details.');
 		console.error(pwError);
 	}
 
