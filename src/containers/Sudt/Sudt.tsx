@@ -230,7 +230,9 @@ function generateTransactionRows(transactions: TransactionTracker[])
 
 	for(const [i, transaction] of transactions.entries())
 	{
-		const explorerLink = (Config.ckbExplorerUrl) ? <a href={Config.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{transaction.txId}</a> : transaction.txId;
+		const shortTx = <span className="short">{transaction.txId.substr(0, 10)}…{transaction.txId.substr(58)}</span>
+		const longTx = <span className="long">{transaction.txId}</span>;
+		const explorerLink = (Config.ckbExplorerUrl) ? <a href={Config.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{shortTx}{longTx}</a> : transaction.txId;
 
 		let transactionStatus;
 		if(transaction.status === TransactionStatus.Pending)

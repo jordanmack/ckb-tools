@@ -1,4 +1,5 @@
 @import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
 
 main.sudt
 {
@@ -45,8 +46,30 @@ main.sudt
 			{
 				padding: 2px 10px 2px 0;
 
+				&:nth-child(1)
+				{
+					.short
+					{
+						display: none;
+					}
+
+					@include media("<=tablet")
+					{
+						.long
+						{
+							display: none;
+						}
+
+						.short
+						{
+							display: inline;
+						}
+					}
+				}
+
 				&:nth-child(2)
 				{
+					min-width: 100px;
 					width: 100px;
 				}
 			}
