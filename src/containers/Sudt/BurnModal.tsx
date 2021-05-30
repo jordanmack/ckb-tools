@@ -29,11 +29,11 @@ function BurnModal(options: ModalOptions)
 			<form id="burn-token-form" onSubmit={()=>false}>
 				<h2>Burn SUDT Tokens</h2>
 				<p>
-					Burn (destory) SUDT tokens on your own address.
+					Burn (destory) SUDT tokens on your current address.
 				</p>
 				<p>
 					<label>
-						CKB Address
+						Nervos CKB Address
 						<input type="text" className="address" defaultValue={options.defaultAddress} disabled={true} />
 					</label>
 				</p>

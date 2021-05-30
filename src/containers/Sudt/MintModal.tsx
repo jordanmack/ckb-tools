@@ -36,7 +36,7 @@ function MintModal(options: ModalOptions)
 				</p>
 				<p>
 					<label>
-						CKB Address
+						Nervos CKB Address
 						<input type="text" className="address" defaultValue={options.defaultAddress} />
 					</label>
 				</p>
