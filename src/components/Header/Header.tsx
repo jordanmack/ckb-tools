@@ -3,7 +3,7 @@ import React from 'react';
 import Navigation from '../Navigation/Navigation';
 import './Header.scss';
 
-function Template()
+function Component()
 {
 	const html =
 	(
@@ -15,4 +15,4 @@ function Template()
 	return html;
 }
 
-export default Template;
+export default Component;

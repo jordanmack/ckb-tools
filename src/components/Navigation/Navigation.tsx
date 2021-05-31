@@ -2,7 +2,7 @@ import React from 'react';
 import {A, usePath} from 'hookrouter';
 import './Navigation.scss';
 
-function Navigation()
+function Component()
 {
 	const currentPath = usePath();
 
@@ -25,4 +25,4 @@ function Navigation()
 	return html;
 }
 
-export default Navigation;
+export default Component;

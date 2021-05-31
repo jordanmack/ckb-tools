@@ -307,7 +307,7 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 	}
 }
 
-function App()
+function Component()
 {
 	const [busy, setBusy] = useState(true);
 	const [loading, setLoading] = useState(true);
@@ -449,4 +449,4 @@ function App()
 	return html;
 }
 
-export default App;
+export default Component;

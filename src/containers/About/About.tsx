@@ -1,7 +1,7 @@
 import React from 'react';
 import './About.scss';
 
-function About()
+function Component()
 {
 	const html =
 	(
@@ -20,4 +20,4 @@ function About()
 	return html;
 }
 
-export default About;
+export default Component;

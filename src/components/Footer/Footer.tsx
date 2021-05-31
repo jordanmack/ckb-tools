@@ -1,7 +1,7 @@
 import React from 'react';
 import './Footer.scss';
 
-function Footer()
+function Component()
 {
 	const html =
 	(
@@ -12,4 +12,4 @@ function Footer()
 	return html;
 }
 
-export default Footer;
+export default Component;

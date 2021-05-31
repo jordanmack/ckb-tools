@@ -2,7 +2,7 @@ import React from 'react';
 import {A} from 'hookrouter';
 import './Home.scss';
 
-function Home()
+function Component()
 {
 	const html =
 	(
@@ -37,4 +37,4 @@ function Home()
 	return html;
 }
 
-export default Home;
+export default Component;

@@ -1,7 +1,7 @@
 import React from 'react';
 import './LoadingSpinner.scss';
 
-function LoadingSpinner()
+function Component()
 {
 	const html =
 	(
@@ -11,4 +11,4 @@ function LoadingSpinner()
 	return html;
 }
 
-export default LoadingSpinner;
+export default Component;

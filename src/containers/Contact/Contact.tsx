@@ -1,7 +1,7 @@
 import React from 'react';
 import './Contact.scss';
 
-function Contact()
+function Component()
 {
 	const html =
 	(
@@ -18,4 +18,4 @@ function Contact()
 	return html;
 }
 
-export default Contact;
+export default Component;
