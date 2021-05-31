@@ -9,8 +9,8 @@ import './Address.scss';
 
 const KNOWN_ADDRESSES: {[key: string]: any} =
 {
-	'ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37': <>Note: This address is genesis issued cell #1 on a CKB dev chain. More information can be found <a href="https://docs.nervos.org/docs/basics/guides/devchain" target="_blank" rel="noreferrer">here.</a></>,
-	'ckt1qyqywrwdchjyqeysjegpzw38fvandtktdhrs0zaxl4': <>Note: This address is genesis issued cell #2 on a CKB dev chain. More information can be found <a href="https://docs.nervos.org/docs/basics/guides/devchain" target="_blank" rel="noreferrer">here.</a></>,
+	'ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37': <>Note: This address is used for genesis issued cell #1 on a CKB dev chain. More information can be found <a href="https://docs.nervos.org/docs/basics/guides/devchain" target="_blank" rel="noreferrer">here.</a></>,
+	'ckt1qyqywrwdchjyqeysjegpzw38fvandtktdhrs0zaxl4': <>Note: This address is used for genesis issued cell #2 on a CKB dev chain. More information can be found <a href="https://docs.nervos.org/docs/basics/guides/devchain" target="_blank" rel="noreferrer">here.</a></>,
 };
 
 enum AddressComponents
