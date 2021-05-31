@@ -63,33 +63,6 @@ a
 	}
 }
 
-button
-{
-	background: $color-button-default;
-	border: 2px solid transparent;
-	border-radius: $border-radius-input;
-	color: $color-font-light;
-	padding: $padding-input/2 $padding-input $padding-input/2 $padding-input;
-
-	&:active,
-	&:hover
-	{
-		background: $color-button-hover;
-	}
-
-	&:active
-	{
-		border: 2px solid #ffffff;
-	}
-
-	&:disabled,
-	&.loading
-	{
-		background: $color-button-disabled;
-		color: $color-font-disabled;
-	}
-}
-
 table
 {
 	border-collapse: collapse;

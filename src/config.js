@@ -4,6 +4,20 @@ const config =
 	ckbIndexerUrl: '//indexer-testnet.ckb.tools',
 	ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
 
+	testnet:
+	{
+		ckbRpcUrl: '//rpc-testnet.ckb.tools',
+		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+		ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
+	},
+
+	mainnet:
+	{
+		ckbRpcUrl: '//rpc.ckb.tools',
+		ckbIndexerUrl: '//indexer.ckb.tools',
+		ckbExplorerUrl: 'https://explorer.nervos.org/',
+	},
+
 	sudtTransactionMonitorDelay: 2_000,
 	sudtTransactionMonitorFailureDelay: 300_000,
 	sudtTransactionMonitorUpdateDelay: 10_000,

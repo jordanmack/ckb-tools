@@ -12,7 +12,8 @@ function Component()
 			<div className="logo"><A href="/">CKB<small>.tools</small></A></div>
 			<ul className="menu1">
 				<li><A href="/" className={(currentPath==='/')?'active':''} title="Home"><i className="fas fa-home"></i></A></li>
-				<li><A href="/sudt" className={(currentPath==='/sudt')?'active':''} title="SUDT Tool">SUDT Tool</A></li>
+				<li><A href="/sudt" className={(currentPath==='/sudt')?'active':''} title="SUDT Tool">SUDT</A></li>
+				<li><A href="/address" className={(currentPath==='/address')?'active':''} title="Address Tool">Address</A></li>
 			</ul>
 			<ul className="menu2">
 				<li><A href="/about" className={(currentPath==='/about')?'active':''} title="About"><i className="fas fa-info-circle"></i></A></li>

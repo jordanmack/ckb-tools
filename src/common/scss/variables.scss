@@ -23,6 +23,8 @@ $color-border-default: #cccccc;
 $color-button-default: $color-nervos-green;
 $color-button-hover: darken($color-button-default, 10%);
 $color-button-disabled: adjust-color($color-button-default, $saturation: -100%, $lightness: -10%, $alpha: -0.4);
+$color-input-read-only: #dddddd;
+$color-input-invalid: adjust-color(#ff0000, $lightness: +40%);
 $color-font-default: #dddddd;
 $color-font-light: #ffffff;
 $color-font-disabled: rgba($color-font-light, 0.2);

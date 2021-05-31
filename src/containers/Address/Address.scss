@@ -1,0 +1,36 @@
+@import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
+
+main.address
+{
+	form
+	{
+		section
+		{
+			margin: 0 0 $margin-thick 0;
+
+			&.flags
+			{
+				fieldset
+				{
+					border: none;
+					display: inline-block;
+					margin: 0;
+					padding: 0 $padding-thick 0 0;
+				}
+
+				label
+				{
+					display: inline-block;
+					margin-right: $margin-default;
+				}
+
+				img.checkbox
+				{
+					margin: 0 0 0 $margin-thin;
+					width: 24px;
+				}
+			}
+		}
+	}
+}
