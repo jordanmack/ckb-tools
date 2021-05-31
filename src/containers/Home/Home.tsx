@@ -15,8 +15,8 @@ function Component()
 				The following tools are currently available, and more will be added as they are completed.
 			</p>
 			<ul>
-				<li><A href="/address">Address Tool</A> - A tool to decode and view Nervos CKB addresses.</li>
-				<li><A href="/sudt">SUDT Tool</A> - A simple tool to create SUDT tokens using MetaMask.</li>
+				<li><A href="/address">Address Tool</A> - A tool to decode and view the components of Nervos CKB addresses.</li>
+				<li><A href="/sudt">SUDT Tool</A> - A simple tool to create SUDT tokens on the Testnet using MetaMask.</li>
 			</ul>
 			<p>
 				These tools are built on the following technologies, tools, and frameworks.
