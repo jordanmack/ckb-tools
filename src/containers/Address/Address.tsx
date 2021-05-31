@@ -179,14 +179,14 @@ function Component()
 				</section>
 				<section className="flags">
 					<fieldset>
-						<label>Mainnet <Flag checked={getAddressFlag(AddressFlags.Mainnet)} /></label>
-						<label>Testnet <Flag checked={getAddressFlag(AddressFlags.Testnet)} /></label>
+						<label><span className="label">Mainnet</span> <Flag checked={getAddressFlag(AddressFlags.Mainnet)} /></label>
+						<label><span className="label">Testnet</span> <Flag checked={getAddressFlag(AddressFlags.Testnet)} /></label>
 					</fieldset>
 					<fieldset>
-						<label>ACP <Flag checked={getAddressFlag(AddressFlags.Acp)} /></label>
-						<label>Default Lock <Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /></label>
-						<label>Multi-Sig Lock <Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /></label>
-						<label>PW-Lock <Flag checked={getAddressFlag(AddressFlags.PwLock)} /></label>
+						<label><span className="label">ACP</span> <Flag checked={getAddressFlag(AddressFlags.Acp)} /></label>
+						<label><span className="label">Default Lock</span> <Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /></label>
+						<label><span className="label">Multi-Sig Lock</span> <Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /></label>
+						<label><span className="label">PW-Lock</span> <Flag checked={getAddressFlag(AddressFlags.PwLock)} /></label>
 					</fieldset>
 				</section>
 			</form>

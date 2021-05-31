@@ -16,18 +16,36 @@ main.address
 					border: none;
 					display: inline-block;
 					margin: 0;
-					padding: 0 $padding-thick 0 0;
+					padding: 0 $padding-thick*2 0 0;
+
+					@include media('<=tablet')
+					{
+						display: block;
+					}
 				}
 
 				label
 				{
 					display: inline-block;
 					margin-right: $margin-default;
+					white-space: nowrap;
+
+					@include media('<=tablet')
+					{
+						display: block;
+						margin: 0;
+
+						span.label
+						{
+							display: inline-block;
+							width: 75px;
+						}
+					}
 				}
 
 				img.checkbox
 				{
-					margin: 0 0 0 $margin-thin;
+					margin: 0 0 0 2px;
 					width: 24px;
 				}
 			}
