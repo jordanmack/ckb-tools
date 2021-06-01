@@ -1,21 +1,21 @@
 const config =
 {
-	ckbRpcUrl: 'https://rpc-testnet.ckb.tools',
-	ckbIndexerUrl: 'https://indexer-testnet.ckb.tools',
-	ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
+	ckbRpcUrl: '//rpc-testnet.ckb.tools',
+	ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+	ckbExplorerUrl: '//explorer.nervos.org/aggron/',
 
 	testnet:
 	{
-		ckbRpcUrl: 'https://rpc-testnet.ckb.tools',
-		ckbIndexerUrl: 'https://indexer-testnet.ckb.tools',
-		ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
+		ckbRpcUrl: '//rpc-testnet.ckb.tools',
+		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+		ckbExplorerUrl: '//explorer.nervos.org/aggron/',
 	},
 
 	mainnet:
 	{
-		ckbRpcUrl: 'https://rpc.ckb.tools',
-		ckbIndexerUrl: 'https://indexer.ckb.tools',
-		ckbExplorerUrl: 'https://explorer.nervos.org/',
+		ckbRpcUrl: '//rpc.ckb.tools',
+		ckbIndexerUrl: '//indexer.ckb.tools',
+		ckbExplorerUrl: '//explorer.nervos.org/',
 	},
 
 	sudtTransactionMonitorDelay: 2_000,
