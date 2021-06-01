@@ -1,20 +1,20 @@
 const config =
 {
-	ckbRpcUrl: '//rpc-testnet.ckb.tools',
-	ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+	ckbRpcUrl: 'https://rpc-testnet.ckb.tools',
+	ckbIndexerUrl: 'https://indexer-testnet.ckb.tools',
 	ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
 
 	testnet:
 	{
-		ckbRpcUrl: '//rpc-testnet.ckb.tools',
-		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+		ckbRpcUrl: 'https://rpc-testnet.ckb.tools',
+		ckbIndexerUrl: 'https://indexer-testnet.ckb.tools',
 		ckbExplorerUrl: 'https://explorer.nervos.org/aggron/',
 	},
 
 	mainnet:
 	{
-		ckbRpcUrl: '//rpc.ckb.tools',
-		ckbIndexerUrl: '//indexer.ckb.tools',
+		ckbRpcUrl: 'https://rpc.ckb.tools',
+		ckbIndexerUrl: 'https://indexer.ckb.tools',
 		ckbExplorerUrl: 'https://explorer.nervos.org/',
 	},
 
