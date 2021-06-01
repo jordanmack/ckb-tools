@@ -19,6 +19,9 @@ function Component()
 				<li><A href="/sudt">SUDT Tool</A> - A simple tool to create SUDT tokens on the Testnet using MetaMask.</li>
 			</ul>
 			<p>
+				Note: In order to use these tools you must have <a href="https://metamask.io/" target="_blank" rel="noreferrer">MetaMask</a> installed.
+			</p>
+			<p>
 				These tools are built on the following technologies, tools, and frameworks.
 			</p>
 			<ul>
