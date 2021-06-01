@@ -15,6 +15,8 @@ import SudtMintBuilder from '../../builders/SudtMintBuilder';
 import Utils from '../../common/ts/Utils';
 import './Sudt.scss';
 
+import ClipboardJS from 'clipboard';
+
 let transactionMonitorTimer: NodeJS.Timeout | null = null;
 
 interface pwObject
@@ -351,6 +353,7 @@ function Component()
 	};
 
 	useEffect(()=>{if(pw){getBalances(pw!.collector, pw!.provider, {callback: updateData});}}, [pw]);
+	useEffect(()=>{new ClipboardJS('.copy-button');}, [data]);
 	useEffect(()=>
 	{
 		if(pw)
@@ -389,11 +392,31 @@ function Component()
 						<tbody>
 							<tr>
 								<td>ETH Address:</td>
-								<td>{(!loading) ? PWCore.provider.address.addressString : '...'}</td>
+								<td>
+									{
+										(loading) ? '...' :
+										(
+											<>
+												{PWCore.provider.address.addressString}
+												<button className="copy-button" data-clipboard-text={PWCore.provider.address.addressString}><i className="far fa-copy"></i></button>
+											</>
+										)
+									}
+								</td>
 							</tr>
 							<tr>
 								<td>CKB Address:</td>
-								<td>{(!loading) ? data!.address.toCKBAddress() : '...'}</td>
+								<td>
+									{
+										(loading) ? '...' :
+										(
+											<>
+												{data!.address.toCKBAddress()}
+												<button className="copy-button" data-clipboard-text={data!.address.toCKBAddress()}><i className="far fa-copy"></i></button>
+											</>
+										)
+									}
+								</td>
 							</tr>
 							<tr>
 								<td>CKB Balance:</td>
@@ -403,7 +426,17 @@ function Component()
 							</tr>
 							<tr>
 								<td>SUDT Token ID:</td>
-								<td>{(!loading) ? data!.address.toLockScript().toHash() : '...'}</td>
+								<td>
+									{
+										(loading) ? '...' :
+										(
+											<>
+												{data!.address.toLockScript().toHash()}
+												<button className="copy-button" data-clipboard-text={data!.address.toLockScript().toHash()}><i className="far fa-copy"></i></button>
+											</>
+										)
+									}
+								</td>
 							</tr>
 							<tr>
 								<td>SUDT Balance:</td>

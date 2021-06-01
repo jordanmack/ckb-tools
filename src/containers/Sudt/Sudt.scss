@@ -80,4 +80,22 @@ main.sudt
 			}
 		}
 	}
+
+	.copy-button
+	{
+		background-color: transparent;
+		border: none;
+		margin-left: $margin-button;
+		padding: 2px 4px 2px 4px;
+
+		&:hover
+		{
+			color: $color-nervos-green;
+		}
+
+		&:active
+		{
+			border: none;
+		}
+	}
 }
