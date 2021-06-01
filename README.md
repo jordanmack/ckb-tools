@@ -16,6 +16,10 @@ These instructions describe how to develop using the CKB.tools code base.
 npm i --force
 ```
 
+### Configure
+
+Edit the `src/config.js` file.
+
 ### Start the Development Server
 ```
 npm start
