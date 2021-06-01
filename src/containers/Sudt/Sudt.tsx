@@ -4,6 +4,7 @@ import PWCore, {Address, AddressType, Amount, AmountUnit, Collector, EthProvider
 import {toast} from 'react-toastify';
 import {Reoverlay} from 'reoverlay';
 import * as _ from 'lodash';
+import ClipboardJS from 'clipboard';
 
 import Config from '../../config.js';
 import BasicCollector from '../../collectors/BasicCollector';
@@ -14,10 +15,6 @@ import SudtBurnBuilder from '../../builders/SudtBurnBuilder';
 import SudtMintBuilder from '../../builders/SudtMintBuilder';
 import Utils from '../../common/ts/Utils';
 import './Sudt.scss';
-
-import ClipboardJS from 'clipboard';
-
-let transactionMonitorTimer: NodeJS.Timeout | null = null;
 
 interface pwObject
 {
@@ -52,6 +49,8 @@ interface TransactionTracker
 	updated: number,
 	status: TransactionStatus
 }
+
+let transactionMonitorTimer: NodeJS.Timeout | null = null;
 
 const getBalances = _.debounce(getBalancesReal, Config.defaultDebouceDelay);
 async function getBalancesReal(collector: BasicCollector, provider: Provider, options?: getBalancesOptions)
