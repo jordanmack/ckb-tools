@@ -214,7 +214,7 @@ function Component()
 		<main className="address">
 			<h2>Address Tool</h2>
 			<p>
-				This tool allows for the decoding of an address to view the components and attributes associated with it.
+				This tool allows Nervos CKB addresses to be decoded to view the components and attributes associated with it.
 			</p>
 			<form id="address-form" className={AddressType[inputAddressType]} onSubmit={()=>false}>
 				<section className="tabs">
