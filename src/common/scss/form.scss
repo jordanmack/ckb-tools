@@ -6,6 +6,7 @@ button
 	border: 2px solid transparent;
 	border-radius: $border-radius-input;
 	color: $color-font-light;
+	cursor: pointer;
 	padding: $padding-input/2 $padding-input $padding-input/2 $padding-input;
 
 	&:active,
