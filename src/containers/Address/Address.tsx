@@ -133,9 +133,7 @@ function Component()
 		if(value !== chainType)
 		{
 			setChainType(value);
-			setValid(false);
-			setInputAddress(null);
-			// handleInputAddressChange(); // This is called in useEffect().
+			// handleInputAddressChange(); // This is now called in useEffect().
 		}
 	};
 
