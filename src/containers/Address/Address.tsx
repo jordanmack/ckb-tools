@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import PWCore, {Address, AddressType, ChainID, CHAIN_SPECS} from '@lay2/pw-core';
+import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import * as _ from 'lodash';
 
 import Config from '../../config.js';
@@ -15,6 +16,7 @@ const KNOWN_ADDRESSES: {[key: string]: any} =
 
 enum AddressComponents
 {
+	CkbAddress,
 	CodeHash,
 	HashType,
 	Args,
@@ -31,11 +33,18 @@ enum AddressFlags
 	Testnet,
 }
 
+enum ChainTypes
+{
+	mainnet,
+	testnet,
+}
+
 async function initPwCore(chain: 'mainnet'|'testnet')
 {
 	const provider = new NullProvider();
 	const collector = new NullCollector();
-	const pwCore = await new PWCore(Config[chain].ckbRpcUrl).init(provider, collector, ChainID.ckb);
+	const chainId = (chain === 'mainnet') ? ChainID.ckb : ChainID.ckb_testnet;
+	const pwCore = await new PWCore(Config[chain].ckbRpcUrl).init(provider, collector, chainId);
 
 	return pwCore;
 }
@@ -53,7 +62,7 @@ function Flag(props: {checked: boolean})
 	return html;
 }
 
-function generateNotesSection(valid: boolean, inputAddress: Address|null)
+function renderNotes(valid: boolean, inputAddress: Address|null)
 {
 	if(!valid || !inputAddress)
 		return null;
@@ -78,25 +87,29 @@ function Component()
 {
 	const [valid, setValid] = useState(false);
 	const [inputAddress, setInputAddress] = useState<Address|null>(null);
+	const [inputAddressType, setInputAddressType] = useState(AddressType.ckb);
+	const [chainType, setChainType] = useState(ChainTypes.mainnet);
 	const inputAddressRef = useRef<HTMLInputElement>(null);
 
-	const handleInputAddressChange = (e: React.SyntheticEvent) =>
+	const handleInputAddressChange = (e?: React.SyntheticEvent) =>
 	{
-		e.preventDefault();
-	
-		const inputAddressString = (inputAddressRef.current?.value) ? inputAddressRef.current?.value : '';
-		const inputAddressPrefix = inputAddressString.substr(0, 3);
+		if(e) e.preventDefault();
 
-		if(inputAddressPrefix !== 'ckb' && inputAddressPrefix !== 'ckt')
+		const inputAddressString = (inputAddressRef.current?.value) ? inputAddressRef.current?.value : '';
+		const inputAddressPrefixCkb = inputAddressString.substr(0, 3);
+		const inputAddressPrefixEth = inputAddressString.substr(0, 2);
+
+		if(inputAddressPrefixCkb !== 'ckb' && inputAddressPrefixCkb !== 'ckt' && inputAddressPrefixEth !== '0x')
 			setValid(false);
 		else
 		{
 			// Init PWCore basec on the prefix of the address provided.
-			// PWCore must be initialized to the proper ChainId before addresses can be validated.
-			initPwCore((inputAddressPrefix==='ckb') ? 'mainnet' : 'testnet')
+			// PWCore must be initialized to the proper ChainId before CKB addresses can be validated.
+			const ct = (inputAddressType===AddressType.ckb) ? (inputAddressPrefixCkb==='ckb') ? 'mainnet' : 'testnet' : ChainTypes[chainType];
+			initPwCore(ct as 'mainnet'|'testnet')
 			.then(()=>
 			{
-				const inputAddress = new Address(inputAddressString, AddressType.ckb);
+				const inputAddress = new Address(inputAddressString, inputAddressType);
 				const valid = inputAddress.valid();
 
 				// The validity of the address controls the order that state is updated.
@@ -115,6 +128,27 @@ function Component()
 		}
 	};
 
+	const handleChainChanged = (value: ChainTypes) =>
+	{
+		if(value !== chainType)
+		{
+			setChainType(value);
+			setValid(false);
+			setInputAddress(null);
+			// handleInputAddressChange(); // This is called in useEffect().
+		}
+	};
+
+	const handleTabClick = (e: React.SyntheticEvent<HTMLSpanElement>) =>
+	{
+		if(e) e.preventDefault();
+
+		setValid(false);
+		setInputAddress(null);
+		if(inputAddressRef.current?.value) inputAddressRef.current.value = '';
+		setInputAddressType(Number(e.currentTarget.dataset['tab']) as AddressType);
+	};
+
 	const getAddressComponent = (component: AddressComponents) =>
 	{
 		if(!valid)
@@ -124,12 +158,14 @@ function Component()
 
 		if(component === AddressComponents.CodeHash)
 			return lockScript.codeHash;
-		if(component === AddressComponents.HashType)
+		else if(component === AddressComponents.HashType)
 			return lockScript.hashType;
-		if(component === AddressComponents.Args)
+		else if(component === AddressComponents.Args)
 			return lockScript.args;
-		if(component === AddressComponents.LockHash)
+		else if(component === AddressComponents.LockHash)
 			return lockScript.toHash();
+		else if(component === AddressComponents.CkbAddress)
+			return inputAddress!.toCKBAddress();
 		else
 			throw new Error('Invalid address component specified.');
 	}
@@ -146,7 +182,7 @@ function Component()
 		const chainSpecs = _.flatMap(CHAIN_SPECS, (n)=>[n]);
 		const acpLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'acpLockList')).map((o)=>o.acpLockList));
 		const defaultLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'defaultLock.script')).map((o)=>o.defaultLock.script));
-		const MultiSigLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'multiSigLock.script')).map((o)=>o.multiSigLock.script));
+		const multiSigLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'multiSigLock.script')).map((o)=>o.multiSigLock.script));
 		const pwLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'pwLock.script')).map((o)=>o.pwLock.script));
 
 		if(flag === AddressFlags.Acp)
@@ -154,21 +190,26 @@ function Component()
 		if(flag === AddressFlags.DefaultLock)
 			return !!defaultLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.MultiSigLock)
-			return !!MultiSigLockList.find((n)=>n.sameWith(lockScript));
+			return !!multiSigLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.PwLock)
 			return !!pwLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.Mainnet)
-			return inputAddressPrefix==='ckb';
-		if(flag === AddressFlags.Testnet)
-			return inputAddressPrefix==='ckt';
+			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckb' : ChainTypes[chainType]==='mainnet';
+			if(flag === AddressFlags.Testnet)
+			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckt' : ChainTypes[chainType]==='testnet';
 		else
 			throw new Error('Invalid address flag specified.');
 	}
 
-	useEffect(()=>
-	{
-		inputAddressRef.current?.focus();
-	});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(()=>{handleInputAddressChange();}, [chainType]); // Trigger an input address change when the chain type is updated to reinitialize all values.
+	useEffect(()=>{inputAddressRef.current?.focus();}, [inputAddressType]); // Focus the input field on load, and when the input address type is changed.
+
+	// Values
+	const inputAddressClassName = (valid) ? 'valid' : 'invalid';
+	const inputAddressPlaceholder = {[AddressType.ckb]: 'Enter a Nervos CKB address to get started. eg: ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37', [AddressType.eth]: 'Enter an Ethereum address to get started. eg: 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'}[inputAddressType];
+	const inputAddressLabel = {[AddressType.ckb]: 'Nervos CKB Address', [AddressType.eth]: 'Ethereum Address'}[inputAddressType];
+	const inputAddressTitle = {[AddressType.ckb]: 'A Nervos CKB address starts with either "ckb" or "ckt".', [AddressType.eth]: 'An Ethereum address starts with "0x" and is 42 characters long.'}[inputAddressType];
 
 	const html =
 	(
@@ -177,13 +218,40 @@ function Component()
 			<p>
 				This tool allows for the decoding of an address to view the components and attributes associated with it.
 			</p>
-			<form id="address-form" onSubmit={()=>false}>
-				<section>
-					<label title='A Nervos CKB address normally started with either "ckb" or "ckt".'>
-						Nervos CKB Address
-						<input id="input-address" className={(valid)?'valid':'invalid'} type="text" onChange={handleInputAddressChange} ref={inputAddressRef} placeholder="Enter a Nervos CKB address to get started. eg: ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37" />
+			<form id="address-form" className={AddressType[inputAddressType]} onSubmit={()=>false}>
+				<section className="tabs">
+					<ul>
+						<li><span className={(inputAddressType===AddressType.ckb)?'active':''} onClick={handleTabClick} data-tab={AddressType.ckb}>Nervos CKB</span></li>
+						<li><span className={(inputAddressType===AddressType.eth)?'active':''} onClick={handleTabClick} data-tab={AddressType.eth}>Ethereum</span></li>
+					</ul>
+				</section>
+				<section className="input-address">
+					<label title={inputAddressTitle}>
+						{inputAddressLabel}
+						<input id="input-address" className={inputAddressClassName} type="text" onChange={handleInputAddressChange} ref={inputAddressRef} placeholder={inputAddressPlaceholder} />
 					</label>
 				</section>
+				{ (inputAddressType===AddressType.eth) &&
+					<section>
+						<label title='Chain types can be either Mainnet or Testnet.'>
+							Nervos CKB Chain Type
+							<SegmentedControl name="chain-type" setValue={handleChainChanged} options={
+								[
+									{label: 'Mainnet', value: ChainTypes.mainnet, default: true},
+									{label: 'Testnet', value: ChainTypes.testnet},
+								]
+							} />
+						</label>
+					</section>
+				}
+				{(inputAddressType===AddressType.eth) &&
+					<section className="output-address">
+						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
+							Nervos CKB Address
+							<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.CkbAddress)} />
+						</label>
+					</section>
+				}
 				<section>
 					<label title="A script code hash indicates the cell dep required for execution.">
 						Lock Script Code Hash
@@ -228,7 +296,7 @@ function Component()
 						</label>
 					</fieldset>
 				</section>
-				{generateNotesSection(valid, inputAddress)}
+				{renderNotes(valid, inputAddress)}
 			</form>
 		</main>
 	);
