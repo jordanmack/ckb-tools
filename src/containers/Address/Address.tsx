@@ -39,12 +39,12 @@ enum ChainTypes
 	testnet,
 }
 
-async function initPwCore(chain: 'mainnet'|'testnet')
+async function initPwCore(chain: ChainTypes)
 {
 	const provider = new NullProvider();
 	const collector = new NullCollector();
-	const chainId = (chain === 'mainnet') ? ChainID.ckb : ChainID.ckb_testnet;
-	const pwCore = await new PWCore(Config[chain].ckbRpcUrl).init(provider, collector, chainId);
+	const chainId = (chain === ChainTypes.mainnet) ? ChainID.ckb : ChainID.ckb_testnet;
+	const pwCore = await new PWCore(Config[ChainTypes[chain] as 'mainnet'|'testnet'].ckbRpcUrl).init(provider, collector, chainId);
 
 	return pwCore;
 }
@@ -105,8 +105,8 @@ function Component()
 		{
 			// Init PWCore basec on the prefix of the address provided.
 			// PWCore must be initialized to the proper ChainId before CKB addresses can be validated.
-			const ct = (inputAddressType===AddressType.ckb) ? (inputAddressPrefixCkb==='ckb') ? 'mainnet' : 'testnet' : ChainTypes[chainType];
-			initPwCore(ct as 'mainnet'|'testnet')
+			const ct = (inputAddressType===AddressType.ckb) ? (inputAddressPrefixCkb==='ckb') ? ChainTypes.mainnet : ChainTypes.testnet : chainType;
+			initPwCore(ct)
 			.then(()=>
 			{
 				const inputAddress = new Address(inputAddressString, inputAddressType);
