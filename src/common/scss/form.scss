@@ -40,6 +40,11 @@ input
 	padding: $padding-input;
 	width: 100%;
 
+	&[type="text"]
+	{
+		text-overflow: ellipsis;
+	}
+
 	&:read-only
 	{
 		background-color: $color-input-read-only;
