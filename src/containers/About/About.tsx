@@ -7,7 +7,7 @@ function Component()
 	(
 		<main className="about">
 			<p>
-				CKB.tools is a online collection of free development tools created by <a href="https://www.jordanmack.info/" target="_blank" rel="noreferrer">Jordan Mack</a>
+				CKB.tools is an online collection of free development tools created by <a href="https://www.jordanmack.info/" target="_blank" rel="noreferrer">Jordan Mack</a>
 				{" "}
 				for use with <a href="https://nervos.org/" target="_blank" rel="noreferrer">Nervos Network</a>.
 			</p>

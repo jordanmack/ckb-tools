@@ -9,7 +9,7 @@ function Component()
 		<main className="home">
 			<img className="logo" src="./nervos-white.png" alt="Nervos Logo" />
 			<p>
-				CKB.tools is a online collection of free development tools for use with <a href="https://nervos.org/" target="_blank" rel="noreferrer">Nervos Network</a>.
+				CKB.tools is an online collection of free development tools for use with <a href="https://nervos.org/" target="_blank" rel="noreferrer">Nervos Network</a>.
 			</p>
 			<p>
 				The following tools are currently available, and more will be added as they are completed.
