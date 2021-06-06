@@ -396,8 +396,8 @@ function Component()
 										(loading) ? '...' :
 										(
 											<>
-												{PWCore.provider.address.addressString}
-												<button className="copy-button" data-clipboard-text={PWCore.provider.address.addressString}><i className="far fa-copy"></i></button>
+												<span id="eth-address">{PWCore.provider.address.addressString}</span>
+												<button className="copy-button" data-clipboard-target="#eth-address"><i className="far fa-copy"></i></button>
 											</>
 										)
 									}
@@ -410,8 +410,8 @@ function Component()
 										(loading) ? '...' :
 										(
 											<>
-												{data!.address.toCKBAddress()}
-												<button className="copy-button" data-clipboard-text={data!.address.toCKBAddress()}><i className="far fa-copy"></i></button>
+												<span id="ckb-address">{data!.address.toCKBAddress()}</span>
+												<button className="copy-button" data-clipboard-target="#ckb-address"><i className="far fa-copy"></i></button>
 											</>
 										)
 									}
@@ -420,7 +420,15 @@ function Component()
 							<tr>
 								<td>CKB Balance:</td>
 								<td>
-									{(!loading) ? Number(data!.capacity.toString(AmountUnit.ckb)).toLocaleString() + ' CKBytes' : '...'}
+									{
+										(loading) ? '...' :
+										(
+											<>
+												{Number(data!.capacity.toString(AmountUnit.ckb)).toLocaleString() + ' CKBytes'}
+												<button className="copy-button" data-clipboard-text={data!.capacity.toString(AmountUnit.ckb)}><i className="far fa-copy"></i></button>
+											</>
+										)
+									}
 								</td>
 							</tr>
 							<tr>
@@ -430,8 +438,8 @@ function Component()
 										(loading) ? '...' :
 										(
 											<>
-												{data!.address.toLockScript().toHash()}
-												<button className="copy-button" data-clipboard-text={data!.address.toLockScript().toHash()}><i className="far fa-copy"></i></button>
+												<span id="token-id">{data!.address.toLockScript().toHash()}</span>
+												<button className="copy-button" data-clipboard-target="#token-id"><i className="far fa-copy"></i></button>
 											</>
 										)
 									}
@@ -439,7 +447,17 @@ function Component()
 							</tr>
 							<tr>
 								<td>SUDT Balance:</td>
-								<td>{(!loading) ? data!.sudtBalance.toString(0) + ' Tokens' : '...'}</td>
+								<td>
+									{
+										(loading) ? '...' :
+										(
+											<>
+												{Number(data!.sudtBalance.toString(0)).toLocaleString() + ' Tokens'}
+												<button className="copy-button" data-clipboard-text={data!.sudtBalance.toString(0)}><i className="far fa-copy"></i></button>
+											</>
+										)
+									}
+								</td>
 							</tr>
 						</tbody>
 					</table>
