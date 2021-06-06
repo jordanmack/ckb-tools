@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import PWCore, {Address, AddressType, ChainID, CHAIN_SPECS} from '@lay2/pw-core';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import * as _ from 'lodash';
+import ClipboardJS from 'clipboard';
 
 import Config from '../../config.js';
 import NullCollector from '../../collectors/NullCollector';
@@ -202,6 +203,7 @@ function Component()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(()=>{handleInputAddressChange();}, [chainType]); // Trigger an input address change when the chain type is updated to reinitialize all values.
 	useEffect(()=>{inputAddressRef.current?.focus();}, [inputAddressType]); // Focus the input field on load, and when the input address type is changed.
+	useEffect(()=>{new ClipboardJS('.copy-button');}, []);
 
 	// Values
 	const inputAddressClassName = (valid) ? 'valid' : 'invalid';
@@ -246,28 +248,43 @@ function Component()
 					<section className="output-address">
 						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
 							Nervos CKB Address
-							<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.CkbAddress)} />
+							<div className="copy-container">
+								<input id="output-address" type="text" readOnly={true} value={getAddressComponent(AddressComponents.CkbAddress)} />
+								<button className="copy-button" data-clipboard-target="#output-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
 						</label>
 					</section>
 				}
 				<section>
 					<label title="A script code hash indicates the cell dep required for execution.">
 						Lock Script Code Hash
-						<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.CodeHash)} />
+						<div className="copy-container">
+							<input id="code-hash" type="text" readOnly={true} value={getAddressComponent(AddressComponents.CodeHash)} />
+							<button className="copy-button" data-clipboard-target="#code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+						</div>
 					</label>
 					<label title="A script hash type indicates how the code hash should be matched against a cell dep.">
 						Lock Script Hash Type
-						<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.HashType)} />
+						<div className="copy-container">
+							<input id="hash-type" type="text" readOnly={true} value={getAddressComponent(AddressComponents.HashType)} />
+							<button className="copy-button" data-clipboard-target="#hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+						</div>
 					</label>
 					<label title="The script args are passed to the script code during execution.">
 						Lock Script Args
-						<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.Args)} />
+						<div className="copy-container">
+							<input id="args" type="text" readOnly={true} value={getAddressComponent(AddressComponents.Args)} />
+							<button className="copy-button" data-clipboard-target="#args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+						</div>
 					</label>
 				</section>
 				<section>
 					<label title="A script hash is a 256-bit Blake2b hash of the script structure once it has been serialized in the Molecule format.">
 						Lock Script Hash
-						<input type="text" readOnly={true} value={getAddressComponent(AddressComponents.LockHash)} />
+						<div className="copy-container">
+							<input id="lock-hash" type="text" readOnly={true} value={getAddressComponent(AddressComponents.LockHash)} />
+							<button className="copy-button" data-clipboard-target="#lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+						</div>
 					</label>
 				</section>
 				<section className="flags">

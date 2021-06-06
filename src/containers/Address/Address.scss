@@ -103,4 +103,30 @@ main.address
 			}
 		}
 	}
+
+	.copy-container
+	{
+		position: relative;
+
+		input[type="text"]
+		{
+			padding-right: 30px;
+		}
+
+		.copy-button
+		{
+			bottom: 5px;
+			position: absolute;
+			background-color: transparent;
+			border: none;
+			padding: 2px 4px 2px 4px;
+			color: #000000;
+			right: 5px;
+
+			&:disabled
+			{
+				color: transparent;				
+			}
+		}
+	}
 }
