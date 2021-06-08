@@ -1,0 +1,35 @@
+BUCKET POLICY
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1623126614412",
+    "Statement": [
+        {
+            "Sid": "Stmt1623126610084",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::cdn.ckb.tools"
+        }
+    ]
+}
+
+CORS
+[
+    {
+        "AllowedHeaders": [
+            "*"
+        ],
+        "AllowedMethods": [
+            "GET",
+            "HEAD",
+            "PUT",
+            "POST",
+            "DELETE"
+        ],
+        "AllowedOrigins": [
+            "*"
+        ],
+        "ExposeHeaders": [],
+        "MaxAgeSeconds": 3000
+    }
+]
