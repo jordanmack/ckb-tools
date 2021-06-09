@@ -13,6 +13,7 @@ function Component()
 			<ul className="menu1">
 				<li><A href="/" className={(currentPath==='/')?'active':''} title="Home"><i className="fas fa-home"></i></A></li>
 				<li><A href="/address" className={(currentPath==='/address')?'active':''} title="Address Tool">Address</A></li>
+				<li><A href="/bootstrap" className={(currentPath==='/bootstrap')?'active':''} title="Bootstrap a Testnet Node">Bootstrap</A></li>
 				<li><A href="/sudt" className={(currentPath==='/sudt')?'active':''} title="SUDT Tool">SUDT</A></li>
 			</ul>
 			<ul className="menu2">

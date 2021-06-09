@@ -1,0 +1,23 @@
+@import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
+
+main.bootstrap
+{
+	.logo
+	{
+		display: block;
+		float: right;
+		padding: 50px 100px 0 0;
+
+		@include media("<=desktop")
+		{
+			margin: $margin-default;
+			padding: 0;
+		}
+
+		@include media("<=tablet")
+		{
+			display: none;
+		}
+	}
+}
