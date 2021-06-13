@@ -7,7 +7,7 @@ main.home
 	{
 		display: block;
 		float: right;
-		padding: 50px 100px 0 0;
+		padding: 0 100px 0 50px;
 
 		@include media("<=desktop")
 		{
