@@ -378,8 +378,10 @@ function Component()
 				<main className="sudt">
 					<h2>SUDT Tool (Testnet)</h2>
 					<p>
-						This tool allows you easily create SUDT tokens.
-						The account you are using in MetaMask is used to generate the SUDT Token ID.
+						The SUDT tool allows you easily create SUDT tokens using just MetaMask.
+					</p>
+					<p>
+						The account selected in MetaMask is used to generate the SUDT Token ID.
 						This account is also the "owner" or "issuer" of the token, and the only account that can mint more tokens.
 						Each account can only have one token associated with it, as intended by the SUDT standard.
 						To create a second token, switch to a different account in MetaMask.
