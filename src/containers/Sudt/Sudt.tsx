@@ -352,13 +352,21 @@ function Component()
 	};
 
 	useEffect(()=>{if(pw){getBalances(pw!.collector, pw!.provider, {callback: updateData});}}, [pw]);
-	useEffect(()=>{new ClipboardJS('.copy-button');}, [data]);
 	useEffect(()=>
 	{
+		if(!busy && !loading && !!data)
+		{
+			new ClipboardJS('.copy-button');
+			Utils.addCopyButtonTooltips('copy-button');
+		}
+	}, [busy, loading, data]);
+	useEffect(()=>
+	{
+		if(transactionMonitorTimer)
+			clearInterval(transactionMonitorTimer);
+
 		if(pw)
 		{
-			if(transactionMonitorTimer)
-				clearInterval(transactionMonitorTimer);
 
 			transactionMonitorTimer = setInterval(() =>
 			{

@@ -15,6 +15,7 @@
     "lodash": "^4.17.21",
     "node-sass": "^6.0.0",
     "npm": "^7.15.1",
+    "primer-tooltips": "^2.0.0",
     "react": "^17.0.2",
     "react-async": "^10.0.1",
     "react-dom": "^17.0.2",

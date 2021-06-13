@@ -7,6 +7,7 @@ import ClipboardJS from 'clipboard';
 import Config from '../../config.js';
 import NullCollector from '../../collectors/NullCollector';
 import NullProvider from '../../providers/NullProvider';
+import Utils from '../../common/ts/Utils';
 import './Address.scss';
 
 const KNOWN_ADDRESSES: {[key: string]: any} =
@@ -203,7 +204,7 @@ function Component()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(()=>{handleInputAddressChange();}, [chainType]); // Trigger an input address change when the chain type is updated to reinitialize all values.
 	useEffect(()=>{inputAddressRef.current?.focus();}, [inputAddressType]); // Focus the input field on load, and when the input address type is changed.
-	useEffect(()=>{new ClipboardJS('.copy-button');}, []);
+	useEffect(()=>{new ClipboardJS('.copy-button');Utils.addCopyButtonTooltips('copy-button');}, [chainType, inputAddressType]); // Initialize the clipboard buttons.
 
 	// Values
 	const inputAddressClassName = (valid) ? 'valid' : 'invalid';
