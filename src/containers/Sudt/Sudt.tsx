@@ -262,7 +262,10 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 {
 	// Get the current time.
 	const time = new Date().getTime();
-	
+
+	// Track if a status change occurred.
+	let statusChanged = false;
+
 	// Sort by the last updated time.
 	const sortedTransactions = _.sortBy(transactions, 'updated');
 	for(const [i, transaction] of sortedTransactions.entries())
@@ -285,11 +288,17 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 
 				// Check if status is committed.
 				if(status === 'committed')
+				{
 					newTransactions[i].status = TransactionStatus.Confirmed;
+					statusChanged = true;
+				}
 
 				// Check if failure time has passed.
 				else if(transaction.timestamp < time - Config.sudtTransactionMonitorFailureDelay)
+				{
 					newTransactions[i].status = TransactionStatus.Failed;
+					statusChanged = true;
+				}
 
 				// Resort by timestamp so they show up in the order they were added.
 				const resortedTransactions = _.sortBy(newTransactions, 'timestamp');
@@ -306,6 +315,8 @@ async function updateTransactionMonitor(pw: pwObject, transactions: TransactionT
 			break;
 		}
 	}
+
+	return statusChanged;
 }
 
 function Component()
@@ -314,6 +325,7 @@ function Component()
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<DataType|null>(null);
 	const [transactions, setTransactions] = useState<TransactionTracker[]>([]);
+	const [transactionStatusUpdateTime, setTransactionStatusUpdateTime] = useState(0);
 	const {data: pw, error: pwError} = useAsync(initPwCore);
 
 	const updateData = (newData: any) =>
@@ -351,7 +363,7 @@ function Component()
 		Reoverlay.showModal(BurnModal, {defaultAddress: pw!.provider.address.toCKBAddress(), defaultAmount: 0, onConfirm});
 	};
 
-	useEffect(()=>{if(pw){getBalances(pw!.collector, pw!.provider, {callback: updateData});}}, [pw]);
+	useEffect(()=>{pw && getBalances(pw!.collector, pw!.provider, {callback: updateData});}, [pw, transactionStatusUpdateTime]);
 	useEffect(()=>
 	{
 		if(!busy && !loading && !!data)
@@ -367,13 +379,15 @@ function Component()
 
 		if(pw)
 		{
-
 			transactionMonitorTimer = setInterval(() =>
 			{
-				updateTransactionMonitor(pw, transactions, setTransactions);
+				updateTransactionMonitor(pw, transactions, setTransactions)
+				.then((result)=>
+				{
+					if(result)
+						setTransactionStatusUpdateTime(new Date().getTime());
+				});
 			}, Config.sudtTransactionMonitorDelay);
-
-			getBalances(pw!.collector, pw!.provider, {callback: updateData});
 		}
 	}, [pw, transactions]);
 
