@@ -1,9 +1,5 @@
 const config =
 {
-	ckbRpcUrl: '//rpc-testnet.ckb.tools',
-	ckbIndexerUrl: '//indexer-testnet.ckb.tools',
-	ckbExplorerUrl: '//explorer.nervos.org/aggron/',
-
 	testnet:
 	{
 		ckbRpcUrl: '//rpc-testnet.ckb.tools',

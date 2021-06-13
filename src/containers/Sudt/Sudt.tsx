@@ -70,7 +70,7 @@ async function getBalancesReal(collector: BasicCollector, provider: Provider, op
 async function mintSudt(pw: pwObject, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
-	const collector = new BasicCollector(Config.ckbIndexerUrl);
+	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtMintBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
@@ -86,7 +86,7 @@ async function mintSudt(pw: pwObject, address: Address, amount: Amount)
 async function burnSudt(pw: pwObject, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
-	const collector = new BasicCollector(Config.ckbIndexerUrl);
+	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtBurnBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
@@ -102,8 +102,8 @@ async function burnSudt(pw: pwObject, address: Address, amount: Amount)
 async function initPwCore()
 {
 	const provider = new EthProvider();
-	const collector = new BasicCollector(Config.ckbIndexerUrl);
-	const pwCore = await new PWCore(Config.ckbRpcUrl).init(provider, collector);
+	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
+	const pwCore = await new PWCore(Config.testnet.ckbRpcUrl).init(provider, collector);
 
 	return {pwCore, provider, collector};
 }
@@ -233,7 +233,7 @@ function generateTransactionRows(transactions: TransactionTracker[])
 	{
 		const shortTx = <span className="short">{transaction.txId.substr(0, 10)}…{transaction.txId.substr(58)}</span>
 		const longTx = <span className="long">{transaction.txId}</span>;
-		const explorerLink = (Config.ckbExplorerUrl) ? <a href={Config.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{shortTx}{longTx}</a> : transaction.txId;
+		const explorerLink = (Config.testnet.ckbExplorerUrl) ? <a href={Config.testnet.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{shortTx}{longTx}</a> : transaction.txId;
 
 		let transactionStatus;
 		if(transaction.status === TransactionStatus.Pending)
