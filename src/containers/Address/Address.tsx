@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import ClipboardJS from 'clipboard';
 
 import Config from '../../config.js';
+import {ChainTypes} from '../../common/ts/Types';
 import NullCollector from '../../collectors/NullCollector';
 import NullProvider from '../../providers/NullProvider';
 import Utils from '../../common/ts/Utils';
@@ -33,12 +34,6 @@ enum AddressFlags
 	PwLock,
 	Mainnet,
 	Testnet,
-}
-
-enum ChainTypes
-{
-	mainnet,
-	testnet,
 }
 
 async function initPwCore(chain: ChainTypes)

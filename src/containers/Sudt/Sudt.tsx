@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {useAsync} from 'react-async';
-import PWCore, {Address, AddressType, Amount, AmountUnit, Collector, EthProvider, Provider, SUDT} from '@lay2/pw-core';
+import PWCore, {Address, AddressType, Amount, AmountUnit, EthProvider, Provider, SUDT} from '@lay2/pw-core';
 import {toast} from 'react-toastify';
 import {Reoverlay} from 'reoverlay';
+import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import * as _ from 'lodash';
 import ClipboardJS from 'clipboard';
 
 import Config from '../../config.js';
+import {ChainTypes} from '../../common/ts/Types';
+import type {ChainTypeString} from '../../common/ts/Types';
 import BasicCollector from '../../collectors/BasicCollector';
 import BurnModal from './BurnModal';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
@@ -16,9 +18,9 @@ import SudtMintBuilder from '../../builders/SudtMintBuilder';
 import Utils from '../../common/ts/Utils';
 import './Sudt.scss';
 
-interface pwObject
+interface PwObject
 {
-	collector: Collector,
+	collector: BasicCollector,
 	pwCore: PWCore,
 	provider: Provider,
 }
@@ -67,10 +69,10 @@ async function getBalancesReal(collector: BasicCollector, provider: Provider, op
 	return data;
 }
 
-async function mintSudt(pw: pwObject, address: Address, amount: Amount)
+async function mintSudt(pw: PwObject, chainType: ChainTypes, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
-	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
+	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtMintBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
@@ -83,10 +85,10 @@ async function mintSudt(pw: pwObject, address: Address, amount: Amount)
 	return txId;
 }
 
-async function burnSudt(pw: pwObject, address: Address, amount: Amount)
+async function burnSudt(pw: PwObject, chainType: ChainTypes, address: Address, amount: Amount)
 {
 	const ownerLockHash = pw.provider.address.toLockScript().toHash();
-	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
+	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
 	const builder = new SudtBurnBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
@@ -99,16 +101,16 @@ async function burnSudt(pw: pwObject, address: Address, amount: Amount)
 	return txId;
 }
 
-async function initPwCore()
+async function initPwCore(chainType: ChainTypes)
 {
 	const provider = new EthProvider();
-	const collector = new BasicCollector(Config.testnet.ckbIndexerUrl);
-	const pwCore = await new PWCore(Config.testnet.ckbRpcUrl).init(provider, collector);
+	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
+	const pwCore = await new PWCore(Config[ChainTypes[chainType] as ChainTypeString].ckbRpcUrl).init(provider, collector);
 
 	return {pwCore, provider, collector};
 }
 
-function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
+function onBurnConfirm(pw: PwObject, chainType: ChainTypes, sudtBalance: Amount, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
 {
 	return function(e: React.SyntheticEvent): boolean
 	{
@@ -143,7 +145,7 @@ function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: R
 			return false;
 		}
 
-		burnSudt(pw, address, amount)
+		burnSudt(pw, chainType, address, amount)
 		.then((txId)=>
 		{
 			options?.addTransaction?.(txId);
@@ -167,7 +169,7 @@ function onBurnConfirm(pw: pwObject, sudtBalance: Amount, options?: {setBusy?: R
 	}
 }
 
-function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
+function onMintConfirm(pw: PwObject, chainType: ChainTypes, options?: {setBusy?: React.Dispatch<any>, addTransaction?: React.Dispatch<any>})
 {
 	return function(e: React.SyntheticEvent): boolean
 	{
@@ -197,7 +199,7 @@ function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>, a
 		}
 	
 		options?.setBusy?.(true);
-		mintSudt(pw, address, amount)
+		mintSudt(pw, chainType, address, amount)
 		.then((txId)=>
 		{
 			options?.addTransaction?.(txId);
@@ -225,7 +227,7 @@ function onMintConfirm(pw: pwObject, options?: {setBusy?: React.Dispatch<any>, a
 	}
 }
 
-function generateTransactionRows(transactions: TransactionTracker[])
+function generateTransactionRows(transactions: TransactionTracker[], chainType: ChainTypes)
 {
 	const rows = [];
 
@@ -233,7 +235,7 @@ function generateTransactionRows(transactions: TransactionTracker[])
 	{
 		const shortTx = <span className="short">{transaction.txId.substr(0, 10)}…{transaction.txId.substr(58)}</span>
 		const longTx = <span className="long">{transaction.txId}</span>;
-		const explorerLink = (Config.testnet.ckbExplorerUrl) ? <a href={Config.testnet.ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{shortTx}{longTx}</a> : transaction.txId;
+		const explorerLink = (Config[ChainTypes[chainType] as ChainTypeString].ckbExplorerUrl) ? <a href={Config[ChainTypes[chainType] as ChainTypeString].ckbExplorerUrl + 'transaction/' + transaction.txId} target="_blank" rel="noreferrer">{shortTx}{longTx}</a> : transaction.txId;
 
 		let transactionStatus;
 		if(transaction.status === TransactionStatus.Pending)
@@ -258,7 +260,7 @@ function generateTransactionRows(transactions: TransactionTracker[])
 	return rows;
 }
 
-async function updateTransactionMonitor(pw: pwObject, transactions: TransactionTracker[], setTransactions: React.Dispatch<any>)
+async function updateTransactionMonitor(pw: PwObject, transactions: TransactionTracker[], setTransactions: React.Dispatch<any>)
 {
 	// Get the current time.
 	const time = new Date().getTime();
@@ -323,10 +325,11 @@ function Component()
 {
 	const [busy, setBusy] = useState(true);
 	const [loading, setLoading] = useState(true);
+	const [chainType, setChainType] = useState(ChainTypes.testnet);
 	const [data, setData] = useState<DataType|null>(null);
 	const [transactions, setTransactions] = useState<TransactionTracker[]>([]);
 	const [transactionStatusUpdateTime, setTransactionStatusUpdateTime] = useState(0);
-	const {data: pw, error: pwError} = useAsync(initPwCore);
+	const [pw, setPw] = useState<PwObject|null>(null);
 
 	const updateData = (newData: any) =>
 	{
@@ -351,18 +354,40 @@ function Component()
 		setTransactions(newTransactions);
 	};
 
+	const handleChainChanged = (value: ChainTypes) =>
+	{
+		if(value !== chainType)
+		{
+			setBusy(true);
+			setLoading(true);
+			setTransactions([]);
+			setTransactionStatusUpdateTime(0);
+			setChainType(value);
+		}
+	};
+
 	const handleMint = () =>
 	{
-		const onConfirm = onMintConfirm(pw!, {setBusy, addTransaction});
+		const onConfirm = onMintConfirm(pw!, chainType, {setBusy, addTransaction});
 		Reoverlay.showModal(MintModal, {defaultAddress: pw!.provider.address.toCKBAddress(), defaultAmount: 0, onConfirm});
 	};
 
 	const handleBurn = () =>
 	{
-		const onConfirm = onBurnConfirm(pw!, data!.sudtBalance, {setBusy, addTransaction});
+		const onConfirm = onBurnConfirm(pw!, chainType, data!.sudtBalance, {setBusy, addTransaction});
 		Reoverlay.showModal(BurnModal, {defaultAddress: pw!.provider.address.toCKBAddress(), defaultAmount: 0, onConfirm});
 	};
 
+	useEffect(()=>
+	{
+		initPwCore(chainType)
+		.then((pwValues) =>
+		{
+			setBusy(true);
+			setLoading(true);
+			setPw(pwValues);
+		});
+	}, [chainType, setPw]);
 	useEffect(()=>{pw && getBalances(pw!.collector, pw!.provider, {callback: updateData});}, [pw, transactionStatusUpdateTime]);
 	useEffect(()=>
 	{
@@ -392,13 +417,13 @@ function Component()
 	}, [pw, transactions]);
 
 	let html = <main></main>;
-	if(!pwError)
+	if(!!pw)
 	{
 		html =
 		(
 			<>
 				<main className="sudt">
-					<h2>SUDT Tool (Testnet)</h2>
+					<h2>SUDT Tool</h2>
 					<p>
 						The SUDT tool allows you easily create SUDT tokens using just MetaMask.
 					</p>
@@ -408,9 +433,17 @@ function Component()
 						Each account can only have one token associated with it, as intended by the SUDT standard.
 						To create a second token, switch to a different account in MetaMask.
 					</p>
-					<p>
-						Note: If you need Testnet CKBytes you can request some from the <a href="https://faucet.nervos.org/" target="_blank" rel="noreferrer">Testnet Faucet</a>.
-					</p>
+					<section className="chain-type">
+						<label title='Chain types can be either Mainnet or Testnet.'>
+							Nervos CKB Chain Type
+							<SegmentedControl name="chain-type" setValue={handleChainChanged} options={
+								[
+									{label: 'Mainnet', value: ChainTypes.mainnet},
+									{label: 'Testnet', value: ChainTypes.testnet, default: true},
+								]
+							} />
+						</label>
+					</section>
 					<table className={(loading) ? 'loading' : ''}>
 						<tbody>
 							<tr>
@@ -450,6 +483,7 @@ function Component()
 											<>
 												{Number(data!.capacity.toString(AmountUnit.ckb)).toLocaleString() + ' CKBytes'}
 												<button className="copy-button" data-clipboard-text={data!.capacity.toString(AmountUnit.ckb)}><i className="far fa-copy"></i></button>
+												{chainType===ChainTypes.testnet && data!.capacity.eq(Amount.ZERO) && <>(Get Testnet CKBytes from the <a href="https://faucet.nervos.org/" target="_blank" rel="noreferrer">Testnet Faucet</a>.)</>}
 											</>
 										)
 									}
@@ -505,7 +539,7 @@ function Component()
 								</tr>
 							</thead>
 							<tbody>
-								{generateTransactionRows(transactions)}
+								{generateTransactionRows(transactions, chainType)}
 							</tbody>
 						</table>
 					</div>
@@ -513,11 +547,6 @@ function Component()
 				{loading && <LoadingSpinner />}
 			</>
 		);
-	}
-	else if(pwError)
-	{
-		toast.error('An error occurred during loading. Please view the console for details.');
-		console.error(pwError);
 	}
 
 	return html;
