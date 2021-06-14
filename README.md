@@ -1,5 +1,13 @@
 # CKB.tools
 
+![GitHub package.json version](https://img.shields.io/github/package-json/v/jordanmack/ckb-tools)
+![GitHub last commit](https://img.shields.io/github/last-commit/jordanmack/ckb-tools)
+![Travis (.org)](https://img.shields.io/travis/jordanmack/ckb-tools)
+![Requires.io](https://img.shields.io/requires/github/jordanmack/ckb-tools)
+![Uptime Robot status](https://img.shields.io/uptimerobot/status/m788404415-839b32111e1dc755c52c3e33)
+![Uptime Robot ratio (30 days)](https://img.shields.io/uptimerobot/ratio/m788404415-839b32111e1dc755c52c3e33)
+![GitHub Repo stars](https://img.shields.io/github/stars/jordanmack/ckb-tools?style=social)
+
 [CKB.tools](https://ckb.tools/) is a online collection of free development tools created for use on Nervos Network.
 
 ## Developing
