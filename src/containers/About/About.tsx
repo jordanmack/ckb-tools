@@ -1,4 +1,5 @@
 import React from 'react';
+import GitHubButton from 'react-github-btn';
 import './About.scss';
 
 function Component()
@@ -12,7 +13,13 @@ function Component()
 				for use with <a href="https://nervos.org/" target="_blank" rel="noreferrer">Nervos Network</a>.
 			</p>
 			<p>
-				The complete source code is available on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
+				The complete source code for all tools is always available on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
+			</p>
+			<p>
+				If this project has helped you, please consider giving it a star on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
+			</p>
+			<p>
+				<GitHubButton href="https://github.com/jordanmack/ckb-tools" data-icon="octicon-star" data-show-count="true" data-size="large" aria-label="Star jordanmack/ckb-tools on GitHub">Star</GitHubButton>
 			</p>
 		</main>
 	);
