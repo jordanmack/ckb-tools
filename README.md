@@ -18,7 +18,7 @@ If you don't need to develop and just want to use the tools, visit the [CKB.tool
 
 ### Prerequisites
 
-- Node.js
+- [Node.js 14+](https://nodejs.org/en/)
 
 ### Install Dependencies
 
