@@ -14,7 +14,6 @@
     "include-media": "^1.4.10",
     "lodash": "^4.17.21",
     "node-sass": "^6.0.0",
-    "npm": "^7.17.0",
     "primer-tooltips": "^2.0.0",
     "react": "^17.0.2",
     "react-async": "^10.0.1",
@@ -25,7 +24,7 @@
     "reoverlay": "^1.0.0",
     "sanitize.css": "^12.0.1",
     "segmented-control": "^0.1.17",
-    "typescript": "^4.3.3"
+    "typescript": "^4.3.4"
   },
   "scripts": {
     "start": "react-scripts start",
