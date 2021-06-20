@@ -18,8 +18,28 @@ function Component()
 				Downloading and using this chain data can save many hours when bootstrapping a new instance of a CKB node or a CKB Indexer.
 			</p>
 			<p>
-				You can view and download the available snapshots from <a href="https://s3.amazonaws.com/cdn.ckb.tools/snapshots.html" target="_blank" rel="noreferrer">Amazon S3</a>.
+				You can view the available snapshots and download them on <a href="https://s3.amazonaws.com/cdn.ckb.tools/snapshots.html" target="_blank" rel="noreferrer">Amazon S3</a>.
 			</p>
+			<p>
+				Usage Instructions:
+			</p>
+			<ol>
+				<li>Install the software for the CKB node, CKB Indexer, or any application that uses them.</li>
+				<li>Follow the normal instructions to configure the software to use the Testnet.</li>
+				<li>On first launch, the software will create the required data folders. As soon as it begins the sync process, shut down the software.</li>
+				<li>Download a snapshot archive to your local hard drive.</li>
+				<li>Decompress the archive to a temporary folder using <a href="https://www.7-zip.org/" target="_blank" rel="noreferrer">7-Zip</a>.</li>
+				<li>Backup or delete the existing chain/indexer files from the application's data folder, the replace them with the contents of the archive.</li>
+				<li>Restart the app and allow it to complete the syncing process.</li>
+			</ol>
+			<p>
+				Data folders for common applications: 
+			</p>
+			<ul>
+				<li>CKB Node: &lt;app_folder&gt;/data/db</li>
+				<li>CKB Indexer: indexer_data (path specified during setup)</li>
+				<li>Neuron Wallet (Win 10): C:\Users\&lt;username&gt;\AppData\Roaming\Neuron\indexer_data\<wbr />0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606</li>
+			</ul>
 		</main>
 	);
 
