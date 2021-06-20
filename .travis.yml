@@ -4,7 +4,7 @@ node_js:
 
 before_script:
   - npm i --force
-  - rm node_modules/hookrouter/dist/index.d.ts
+  - rm -f node_modules/hookrouter/dist/index.d.ts
 
 script:
   - npm run build
