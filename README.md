@@ -26,7 +26,7 @@ If you don't need to develop and just want to use the tools, visit the [CKB.tool
 npm i --force
 ```
 
-You will also need to delete the following file due to a problem in its NPM package.
+You will also need to delete the following file due to a problem in the NPM package.
 
 ```
 rm -f node_modules/hookrouter/dist/index.d.ts
