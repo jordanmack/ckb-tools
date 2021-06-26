@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@lay2/pw-core": "^0.3.22",
+    "@metamask/detect-provider": "^1.2.0",
     "@types/hookrouter": "^2.2.5",
     "@types/lodash": "^4.14.170",
     "@types/node": "^15.12.4",

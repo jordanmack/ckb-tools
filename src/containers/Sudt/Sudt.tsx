@@ -5,6 +5,7 @@ import {Reoverlay} from 'reoverlay';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import * as _ from 'lodash';
 import ClipboardJS from 'clipboard';
+import detectEthereumProvider from '@metamask/detect-provider';
 
 import Config from '../../config.js';
 import {ChainTypes} from '../../common/ts/Types';
@@ -381,12 +382,21 @@ function Component()
 
 	useEffect(()=>
 	{
-		initPwCore(chainType)
-		.then((pwValues) =>
+		detectEthereumProvider()
+		.then(function(provider)
 		{
-			setBusy(true);
-			setLoading(true);
-			setPw(pwValues);
+			if(provider)
+			{
+				initPwCore(chainType)
+				.then((pwValues) =>
+				{
+					setBusy(true);
+					setLoading(true);
+					setPw(pwValues);
+				});
+			}
+			else
+				alert('A MetaMask compatible browser extension was not detected.\nThis tool will not function without one installed.');
 		});
 	}, [chainType, setPw]);
 	useEffect(()=>{pw && getBalances(pw!.collector, pw!.provider, {callback: updateData});}, [pw, transactionStatusUpdateTime]);
