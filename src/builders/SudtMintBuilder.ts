@@ -4,17 +4,19 @@ import BasicCollector from "../collectors/BasicCollector";
 export default class SudtMintBuilder extends Builder
 {
 	sudt: SUDT;
-	address: Address;
+	issuerAddress: Address;
+	destinationAddress: Address;
 	amount: Amount;
 	collector: BasicCollector;
 	fee: Amount;
 
-	constructor(sudt: SUDT, address: Address, amount: Amount, collector: BasicCollector, fee: Amount)
+	constructor(sudt: SUDT, issuerAddress: Address, destinationAddress: Address, amount: Amount, collector: BasicCollector, fee: Amount)
 	{
 		super();
 
 		this.sudt = sudt;
-		this.address = address;
+		this.issuerAddress = issuerAddress;
+		this.destinationAddress = destinationAddress;
 		this.amount = amount;
 		this.collector = collector;
 		this.fee = fee;
@@ -23,7 +25,8 @@ export default class SudtMintBuilder extends Builder
 	async build(): Promise<Transaction>
 	{
 		// Aliases
-		const address = this.address;
+		const issuerAddress = this.issuerAddress;
+		const destinationAddress = this.destinationAddress;
 		const amount = this.amount;
 		const collector = this.collector;
 		const fee = this.fee;
@@ -36,7 +39,7 @@ export default class SudtMintBuilder extends Builder
 
 		// Create the SUDT output cell.
 		const typeScript = sudt.toTypeScript();
-		const lockScript = address.toLockScript();
+		const lockScript = destinationAddress.toLockScript();
 		const sudtCell = new Cell(new Amount("142", AmountUnit.ckb), lockScript, typeScript, undefined, amount.toUInt128LE());
 		outputCells.push(sudtCell);
 
@@ -44,7 +47,7 @@ export default class SudtMintBuilder extends Builder
 		const neededAmount = sudtCell.capacity.add(new Amount("61", AmountUnit.ckb)).add(fee);
 
 		// Add necessary capacity.
-		const capacityCells = await collector.collectCapacity(address, neededAmount);
+		const capacityCells = await collector.collectCapacity(issuerAddress, neededAmount);
 		for(const cell of capacityCells)
 			inputCells.push(cell);
 
@@ -53,7 +56,8 @@ export default class SudtMintBuilder extends Builder
 		const changeCapacity = inputCapacity.sub(neededAmount.sub(new Amount("61", AmountUnit.ckb)));
 
 		// Add the change cell.
-		const changeCell = new Cell(changeCapacity, lockScript);
+		const changeLockScript = issuerAddress.toLockScript()
+		const changeCell = new Cell(changeCapacity, changeLockScript);
 		outputCells.push(changeCell);
 
 		// Add the required cell deps.

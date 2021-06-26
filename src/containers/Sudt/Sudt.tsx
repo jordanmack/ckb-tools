@@ -69,13 +69,14 @@ async function getBalancesReal(collector: BasicCollector, provider: Provider, op
 	return data;
 }
 
-async function mintSudt(pw: PwObject, chainType: ChainTypes, address: Address, amount: Amount)
+async function mintSudt(pw: PwObject, chainType: ChainTypes, destinationAddress: Address, amount: Amount)
 {
-	const ownerLockHash = pw.provider.address.toLockScript().toHash();
+	const issuerAddress = pw.provider.address;
+	const issuerLockHash = issuerAddress.toLockScript().toHash();
 	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
-	const builder = new SudtMintBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
+	const builder = new SudtMintBuilder(new SUDT(issuerLockHash), issuerAddress, destinationAddress, amount, collector, fee);
 	const transaction = await builder.build();
 	console.info(transaction);
 
@@ -85,13 +86,13 @@ async function mintSudt(pw: PwObject, chainType: ChainTypes, address: Address, a
 	return txId;
 }
 
-async function burnSudt(pw: PwObject, chainType: ChainTypes, address: Address, amount: Amount)
+async function burnSudt(pw: PwObject, chainType: ChainTypes, burnAddress: Address, amount: Amount)
 {
-	const ownerLockHash = pw.provider.address.toLockScript().toHash();
+	const issuerLockHash = pw.provider.address.toLockScript().toHash();
 	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
 	const fee = new Amount('10000', AmountUnit.shannon);
 
-	const builder = new SudtBurnBuilder(new SUDT(ownerLockHash), address, amount, collector, fee);
+	const builder = new SudtBurnBuilder(new SUDT(issuerLockHash), burnAddress, amount, collector, fee);
 	const transaction = await builder.build();
 	console.info(transaction);
 
