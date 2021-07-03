@@ -1,14 +1,14 @@
 import {useRoutes} from 'hookrouter';
 
 import './App.scss';
-import About from './About/About';
-import Address from './Address/Address';
-import Bootstrap from './Bootstrap/Bootstrap';
-import Contact from './Contact/Contact';
-import Footer from '../components/Footer/Footer';
-import Header from '../components/Header/Header';
-import Home from './Home/Home';
-import Sudt from './Sudt/Sudt';
+import About from '../About/About';
+import Address from '../Address/Address';
+import Bootstrap from '../Bootstrap/Bootstrap';
+import Contact from '../Contact/Contact';
+import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header/Header';
+import Home from '../Home/Home';
+import Sudt from '../Sudt/Sudt';
 
 const routes =
 {

@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {ModalContainer} from 'reoverlay';
 import 'reoverlay/lib/ModalWrapper.css';
 
-import App from './containers/App';
+import App from './containers/App/App';
 import "./index.scss";
 
 async function main()
