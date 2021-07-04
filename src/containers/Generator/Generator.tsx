@@ -338,7 +338,7 @@ function Component()
 					</section>
 				</fieldset>
 				<fieldset>
-					<legend>ACP Lock - Testnet</legend>
+					<legend>ACP Lock (Anyone Can Pay) - Testnet</legend>
 					<section>
 						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
 							Nervos CKB Address
