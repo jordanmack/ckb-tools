@@ -17,6 +17,7 @@ function Component()
 			<ul>
 				<li><A href="/address">Address Tool</A> - A tool to view the components and attributes of Nervos CKB addresses.</li>
 				<li><A href="/bootstrap">Bootstrap</A> - Recent snapshots of the Testnet chain data to speed up the initial sync.</li>
+				<li><A href="/generator">Generator Tool</A> - A tool to generate Testnet private keys and addresses.</li>
 				<li><A href="/sudt">SUDT Tool</A> - A tool to create SUDT tokens on the Testnet using MetaMask.</li>
 			</ul>
 			<p>

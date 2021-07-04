@@ -6,6 +6,7 @@ import Address from '../Address/Address';
 import Bootstrap from '../Bootstrap/Bootstrap';
 import Contact from '../Contact/Contact';
 import Footer from '../../components/Footer/Footer';
+import Generator from '../Generator/Generator';
 import Header from '../../components/Header/Header';
 import Home from '../Home/Home';
 import Sudt from '../Sudt/Sudt';
@@ -17,6 +18,7 @@ const routes =
 	'/address': () => <Address />,
 	'/bootstrap': () => <Bootstrap />,
 	'/contact': () => <Contact />,
+	'/generator': () => <Generator />,
 	'/sudt': () => <Sudt />,
 };
 

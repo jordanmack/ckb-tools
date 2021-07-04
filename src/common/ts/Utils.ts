@@ -1,3 +1,5 @@
+import {Reader} from 'ckb-js-toolkit';
+
 function addCopyButtonTooltips(className: string)
 {
 	const addToolTip = (e: Event) =>
@@ -73,9 +75,21 @@ function decodeError(error: Error, passedOptions?: DecodeErrorOptions)
 	return null;
 }
 
-const exports =
+function arrayBufferToHex(arrayBuffer: ArrayBuffer)
+{
+	return new Reader(arrayBuffer).serializeJson();
+}
+
+function hexToArrayBuffer(hexString: string)
+{
+	return new Reader(hexString).toArrayBuffer();
+}
+
+const exportObj =
 {
 	addCopyButtonTooltips,
+	arrayBufferToHex,
 	decodeError,
+	hexToArrayBuffer,
 };
-export default exports;
+export default exportObj;

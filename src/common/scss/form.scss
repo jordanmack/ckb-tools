@@ -33,6 +33,11 @@ form
 	display: block;
 }
 
+fieldset
+{
+	padding: $padding-thin $padding-default $padding-default $padding-default;
+}
+
 input
 {
 	border: none;
@@ -60,4 +65,5 @@ label
 {
 	display: block;
 	font-size: 0.8rem;
+	margin-top: 2px;
 }

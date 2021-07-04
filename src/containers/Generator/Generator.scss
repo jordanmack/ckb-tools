@@ -1,0 +1,122 @@
+@import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
+
+main.generator
+{
+	form
+	{
+		input[type="text"]
+		{
+			font-family: $font-family-monospace;
+		}
+
+		section
+		{
+			margin: 0 0 $margin-thick 0;
+		}
+
+		fieldset
+		{
+			margin: 0 0 $margin-thick 0;
+
+			section
+			{
+				margin: 0;
+			}
+		}
+
+		.tabs
+		{
+			$tab-height: 31px;
+
+			ul
+			{
+				border-bottom: 1px solid $color-border-default;
+				display: block;
+				height: $tab-height;
+				margin: 0;
+				padding: 0;
+
+				li
+				{
+					display: inline-block;
+					margin: 0 $margin-thin 0 0;
+					height: $tab-height;
+
+					span
+					{
+						border: 1px solid transparent;
+						cursor: pointer;
+						padding: $padding-thin;
+
+						&.active
+						{
+							border: 1px solid $color-border-default;
+							border-bottom: 1px solid #000000;
+							border-radius: $border-radius-input $border-radius-input 0 0;
+							line-height: $tab-height;
+						}
+					}
+				}
+			}
+		}
+
+		.segmented-control
+		{
+			margin: 0;
+			transition-duration: 0.2s;
+
+			label
+			{
+				color: $color-nervos-green;
+			}
+		}
+	}
+
+	.copy-container
+	{
+		position: relative;
+
+		input[type="text"]
+		{
+			padding-right: 30px;
+		}
+
+		.copy-button
+		{
+			bottom: 5px;
+			position: absolute;
+			background-color: transparent;
+			border: none;
+			padding: 2px 4px 2px 4px;
+			color: #000000;
+			right: 5px;
+
+			&:disabled
+			{
+				color: transparent;				
+			}
+		}
+
+		.generate-button
+		{
+			bottom: 5px;
+			position: absolute;
+			background-color: transparent;
+			border: none;
+			padding: 2px 4px 2px 4px;
+			color: #000000;
+			right: 5px;
+
+			&:disabled
+			{
+				color: transparent;				
+			}
+
+			&.valid
+			{
+				right: 25px;
+			}
+		}
+	}
+}
