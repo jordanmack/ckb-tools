@@ -13,6 +13,12 @@ main
 	max-width: map-get($breakpoints, "desktop");
 	min-width: 375px;
 	width: 100%;
+	z-index: $z-index-main;
+
+	@include media("<=tablet")
+	{
+		padding: $padding-default;
+	}
 }
 
 span.spacer

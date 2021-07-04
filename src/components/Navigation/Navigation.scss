@@ -3,9 +3,24 @@
 
 nav.primary
 {
-	background: $color-background-default;
+	$navigation-height: 42px;
+
 	font-family: $font-family-alternate;
+	height: $navigation-height;
 	padding: $padding-default;
+	position: relative;
+	z-index: $z-index-navigation;
+
+	div.background
+	{
+		background: $color-background-default;
+		height: $navigation-height;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: -1;
+	}
 
 	div.logo
 	{
@@ -37,6 +52,11 @@ nav.primary
 		padding: 0;
 		margin: 0;
 
+		@include media("<=tablet")
+		{
+			display: none;
+		}
+
 		li
 		{
 			display: inline-block;
@@ -57,5 +77,59 @@ nav.primary
 	ul.menu2
 	{
 		float: right;
+	}
+
+	.hamburger
+	{
+		background: transparent;
+		border: 0;
+		display: none;
+		font-size: 1.4rem;
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		top: $margin-default;
+		right: $margin-default;
+
+		@include media("<=tablet")
+		{
+			display: block;
+		}
+	}
+
+	.menu3-backdrop
+	{
+		display: none;
+		opacity: 0.5;
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 100%;
+
+		&.active
+		{
+			display: block;
+		}
+	}
+
+	ul.menu3
+	{
+		background: $color-background-default;
+		display: none;
+		line-height: 2rem;
+		margin: 0;
+		min-width: 160px;
+		padding: $padding-default;
+		position: absolute;
+		top: $navigation-height;
+		right: 0;
+
+		@include media("<=tablet")
+		{
+			&.active
+			{
+				display: block;
+			}
+		}
 	}
 }
