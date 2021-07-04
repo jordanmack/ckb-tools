@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {AddressPrefix, privateKeyToPublicKey, privateKeyToAddress} from '@nervosnetwork/ckb-sdk-utils';
-import PWCore, {Address, AddressType, ChainID} from '@lay2/pw-core';
+import PWCore, {Address, AddressType, ChainID, HashType, Script} from '@lay2/pw-core';
 // import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import ethWallet from 'ethereumjs-wallet';
 import arrayBufferToBuffer from 'arraybuffer-to-buffer';
@@ -30,6 +30,11 @@ enum GeneratorComponents
 	PwHashType,
 	PwArgs,
 	PwLockHash,
+	AcpAddress,
+	AcpCodeHash,
+	AcpHashType,
+	AcpArgs,
+	AcpLockHash,
 }
 
 function generateRandomPrivateKey()
@@ -157,6 +162,33 @@ function Component()
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
 				lockScript = address.toLockScript();
+				lockScriptHash = lockScript.toHash() 
+				return lockScriptHash;
+			case GeneratorComponents.AcpAddress:
+				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				lockScript = address.toLockScript();
+				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
+				address = lockScript.toAddress();
+				return address.toCKBAddress();
+			case GeneratorComponents.AcpCodeHash:
+				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				lockScript = address.toLockScript();
+				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
+				return lockScript.codeHash;
+			case GeneratorComponents.AcpHashType:
+				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				lockScript = address.toLockScript();
+				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
+				return lockScript.hashType;
+			case GeneratorComponents.AcpArgs:
+				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				lockScript = address.toLockScript();
+				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
+				return lockScript.args;
+			case GeneratorComponents.AcpLockHash:
+				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				lockScript = address.toLockScript();
+				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				lockScriptHash = lockScript.toHash() 
 				return lockScriptHash;
 			default:
@@ -300,6 +332,50 @@ function Component()
 							Lock Script Hash
 							<div className="copy-container">
 								<input id="pw-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwLockHash)} />
+								<button className="copy-button" data-clipboard-target="#pw-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+				</fieldset>
+				<fieldset>
+					<legend>ACP Lock - Testnet</legend>
+					<section>
+						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
+							Nervos CKB Address
+							<div className="copy-container">
+								<input id="pw-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpAddress)} />
+								<button className="copy-button" data-clipboard-target="#pw-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+					<section>
+						<label title="A script code hash indicates the cell dep required for execution.">
+							Lock Script Code Hash
+							<div className="copy-container">
+								<input id="pw-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpCodeHash)} />
+								<button className="copy-button" data-clipboard-target="#pw-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+						<label title="A script hash type indicates how the code hash should be matched against a cell dep.">
+							Lock Script Hash Type
+							<div className="copy-container">
+								<input id="pw-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpHashType)} />
+								<button className="copy-button" data-clipboard-target="#pw-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+						<label title="The script args are passed to the script code during execution.">
+							Lock Script Args
+							<div className="copy-container">
+								<input id="pw-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpArgs)} />
+								<button className="copy-button" data-clipboard-target="#pw-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+					<section>
+						<label title="A script hash is a 256-bit Blake2b hash of the script structure once it has been serialized in the Molecule format.">
+							Lock Script Hash
+							<div className="copy-container">
+								<input id="pw-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpLockHash)} />
 								<button className="copy-button" data-clipboard-target="#pw-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
