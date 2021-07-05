@@ -226,7 +226,7 @@ function Component()
 						<label title="A 256-bit (32 byte) private key.">
 							Private Key (256-bit)
 							<div className="copy-container">
-								<input id="private-key" className={privateKeyClassName} type="text" onChange={handlePrivateKeyChange} ref={privateKeyRef} placeholder="Enter a 256-bit (32 byte) private key in hex format, or press the generate button." />
+								<input id="private-key" className={'private-key '+privateKeyClassName} type="text" onChange={handlePrivateKeyChange} ref={privateKeyRef} placeholder="Enter a 256-bit (32 byte) private key in hex format, or press the generate button." />
 								<button className="copy-button" data-clipboard-target="#private-key" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 								<button className={"generate-button" + ((valid)?' valid':'')} onClick={handleGenerateClicked} title="Generate a new random private key."><i className="fas fa-sync-alt"></i></button>
 							</div>

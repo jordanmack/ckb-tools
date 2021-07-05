@@ -80,6 +80,11 @@ main.generator
 		input[type="text"]
 		{
 			padding-right: 30px;
+
+			&.private-key
+			{
+				padding-right: 50px;
+			}
 		}
 
 		.copy-button
