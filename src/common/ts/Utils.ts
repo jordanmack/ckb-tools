@@ -4,18 +4,22 @@ function addCopyButtonTooltips(className: string)
 {
 	const addToolTip = (e: Event) =>
 	{
-		(e.currentTarget as HTMLButtonElement).classList.add('tooltipped');
-		(e.currentTarget as HTMLButtonElement).classList.add('tooltipped-e');
-		(e.currentTarget as HTMLButtonElement).classList.add('tooltipped-no-delay');
-		(e.currentTarget as HTMLButtonElement).setAttribute('aria-label', 'Copied!');
+		const element = e.currentTarget as HTMLButtonElement; 
+		const tooltipDirection = (window.innerWidth >= 1280) ? 'tooltipped-e' : 'tooltipped-s';
+		element.classList.add('tooltipped');
+		element.classList.add(tooltipDirection);
+		element.classList.add('tooltipped-no-delay');
+		element.setAttribute('aria-label', 'Copied!');
 	};
 
 	const removeToolTip = (e: Event) =>
 	{
-		(e.currentTarget as HTMLButtonElement).classList.remove('tooltipped');
-		(e.currentTarget as HTMLButtonElement).classList.remove('tooltipped-e');
-		(e.currentTarget as HTMLButtonElement).classList.remove('tooltipped-no-delay');
-		(e.currentTarget as HTMLButtonElement).setAttribute('aria-label', '');
+		const element = e.currentTarget as HTMLButtonElement; 
+		element.classList.remove('tooltipped');
+		element.classList.remove('tooltipped-e');
+		element.classList.remove('tooltipped-s');
+		element.classList.remove('tooltipped-no-delay');
+		element.setAttribute('aria-label', '');
 	};
 	
 	for(const e of document.getElementsByClassName(className))
