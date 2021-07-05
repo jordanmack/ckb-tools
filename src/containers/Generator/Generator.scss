@@ -25,42 +25,6 @@ main.generator
 			}
 		}
 
-		.tabs
-		{
-			$tab-height: 31px;
-
-			ul
-			{
-				border-bottom: 1px solid $color-border-default;
-				display: block;
-				height: $tab-height;
-				margin: 0;
-				padding: 0;
-
-				li
-				{
-					display: inline-block;
-					margin: 0 $margin-thin 0 0;
-					height: $tab-height;
-
-					span
-					{
-						border: 1px solid transparent;
-						cursor: pointer;
-						padding: $padding-thin;
-
-						&.active
-						{
-							border: 1px solid $color-border-default;
-							border-bottom: 1px solid #000000;
-							border-radius: $border-radius-input $border-radius-input 0 0;
-							line-height: $tab-height;
-						}
-					}
-				}
-			}
-		}
-
 		.segmented-control
 		{
 			margin: 0;
