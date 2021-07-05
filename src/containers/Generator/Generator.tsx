@@ -343,8 +343,8 @@ function Component()
 						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
 							Nervos CKB Address
 							<div className="copy-container">
-								<input id="pw-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpAddress)} />
-								<button className="copy-button" data-clipboard-target="#pw-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<input id="acp-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpAddress)} />
+								<button className="copy-button" data-clipboard-target="#acp-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 					</section>
@@ -352,22 +352,22 @@ function Component()
 						<label title="A script code hash indicates the cell dep required for execution.">
 							Lock Script Code Hash
 							<div className="copy-container">
-								<input id="pw-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpCodeHash)} />
-								<button className="copy-button" data-clipboard-target="#pw-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<input id="acp-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpCodeHash)} />
+								<button className="copy-button" data-clipboard-target="#acp-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 						<label title="A script hash type indicates how the code hash should be matched against a cell dep.">
 							Lock Script Hash Type
 							<div className="copy-container">
-								<input id="pw-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpHashType)} />
-								<button className="copy-button" data-clipboard-target="#pw-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<input id="acp-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpHashType)} />
+								<button className="copy-button" data-clipboard-target="#acp-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 						<label title="The script args are passed to the script code during execution.">
 							Lock Script Args
 							<div className="copy-container">
-								<input id="pw-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpArgs)} />
-								<button className="copy-button" data-clipboard-target="#pw-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<input id="acp-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpArgs)} />
+								<button className="copy-button" data-clipboard-target="#acp-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 					</section>
@@ -375,8 +375,8 @@ function Component()
 						<label title="A script hash is a 256-bit Blake2b hash of the script structure once it has been serialized in the Molecule format.">
 							Lock Script Hash
 							<div className="copy-container">
-								<input id="pw-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpLockHash)} />
-								<button className="copy-button" data-clipboard-target="#pw-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<input id="acp-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpLockHash)} />
+								<button className="copy-button" data-clipboard-target="#acp-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 					</section>
