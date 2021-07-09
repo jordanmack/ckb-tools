@@ -16,7 +16,7 @@ function Component()
 				The complete source code for all tools is always available on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
 			</p>
 			<p>
-				If this project has helped you, please consider giving it a star on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
+				Donations are not necessary. If you like this project, please consider giving it a star on <a href="https://github.com/jordanmack/ckb-tools" target="_blank" rel="noreferrer">GitHub</a>.
 			</p>
 			<p>
 				<GitHubButton href="https://github.com/jordanmack/ckb-tools" data-icon="octicon-star" data-show-count="true" data-size="large" aria-label="Star jordanmack/ckb-tools on GitHub">Star</GitHubButton>
