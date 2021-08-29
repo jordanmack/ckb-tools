@@ -22,13 +22,13 @@ If you don't need to develop and just want to use the tools, visit the [CKB.tool
 
 ### Install Dependencies
 
-```
+```sh
 npm i --force
 ```
 
 You will also need to delete the following file due to a problem in the NPM package.
 
-```
+```sh
 rm -f node_modules/hookrouter/dist/index.d.ts
 ```
 
@@ -37,12 +37,14 @@ rm -f node_modules/hookrouter/dist/index.d.ts
 Edit the `src/config.js` file.
 
 ### Start the Development Server
-```
+
+```sh
 npm start
 ```
 
 ### Building
-```
+
+```sh
 npm run build
 ```
 
