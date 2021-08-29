@@ -1,0 +1,18 @@
+@import '../../common/scss/variables.scss';
+
+.reOverlay .reOverlay__modalWrapper .reOverlay__modalContainer.qrcode
+{
+	.image
+	{
+		margin-top: $margin-thick;
+		text-align: center;
+	}
+	.description
+	{
+		font-size: 0.8rem;
+		line-height: 1.2em;
+		margin: $margin-default auto;
+		text-align: center;
+		max-width: 320px;
+	}
+}
