@@ -7,11 +7,13 @@ import arrayBufferToBuffer from 'arraybuffer-to-buffer';
 import * as Crypto from 'crypto';
 // import * as _ from 'lodash';
 import ClipboardJS from 'clipboard';
+import {Reoverlay} from 'reoverlay';
 
 import Config from '../../config.js';
 import {ChainTypes} from '../../common/ts/Types';
 import NullCollector from '../../collectors/NullCollector';
 import NullProvider from '../../providers/NullProvider';
+import QrCode from '../../components/QrCode/QrCode';
 import Utils from '../../common/ts/Utils';
 import './Generator.scss';
 
@@ -66,6 +68,17 @@ function isPrivateKeyValid(privateKey: string)
 	const re = /^0x[a-f0-9]{64}$/i;
 
 	return re.test(privateKey);
+}
+
+function renderQrCode(e?: React.SyntheticEvent<HTMLButtonElement>)
+{
+	if(e)
+	{
+		e.preventDefault();
+
+		const value = (document.getElementById(e.currentTarget.dataset.target!.substr(1)) as HTMLInputElement).value;
+		Reoverlay.showModal(QrCode, {value});
+	}
 }
 
 function Component()
@@ -228,6 +241,7 @@ function Component()
 							<div className="copy-container">
 								<input id="private-key" className={'private-key '+privateKeyClassName} type="text" onChange={handlePrivateKeyChange} ref={privateKeyRef} placeholder="Enter a 256-bit (32 byte) private key in hex format, or press the generate button." />
 								<button className="copy-button" data-clipboard-target="#private-key" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#private-key" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className={"generate-button" + ((valid)?' valid':'')} onClick={handleGenerateClicked} title="Generate a new random private key."><i className="fas fa-sync-alt"></i></button>
 							</div>
 						</label>
@@ -235,6 +249,7 @@ function Component()
 							Public Key (Secp256k1)
 							<div className="copy-container">
 								<input id="public-key" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PublicKey)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#public-key" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#public-key" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -247,6 +262,7 @@ function Component()
 							Nervos CKB Address
 							<div className="copy-container">
 								<input id="ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -256,6 +272,7 @@ function Component()
 							Lock Script Code Hash
 							<div className="copy-container">
 								<input id="ckb-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbCodeHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-code-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -263,6 +280,7 @@ function Component()
 							Lock Script Hash Type
 							<div className="copy-container">
 								<input id="ckb-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbHashType)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-hash-type" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -270,6 +288,7 @@ function Component()
 							Lock Script Args
 							<div className="copy-container">
 								<input id="ckb-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbArgs)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-args" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -279,6 +298,7 @@ function Component()
 							Lock Script Hash
 							<div className="copy-container">
 								<input id="ckb-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbLockHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -291,6 +311,7 @@ function Component()
 							Ethereum Address
 							<div className="copy-container">
 								<input id="pw-eth-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwEthAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-eth-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-eth-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -300,6 +321,7 @@ function Component()
 							Nervos CKB Address
 							<div className="copy-container">
 								<input id="pw-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-ckb-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -309,6 +331,7 @@ function Component()
 							Lock Script Code Hash
 							<div className="copy-container">
 								<input id="pw-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwCodeHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-code-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -316,6 +339,7 @@ function Component()
 							Lock Script Hash Type
 							<div className="copy-container">
 								<input id="pw-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwHashType)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-hash-type" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -323,6 +347,7 @@ function Component()
 							Lock Script Args
 							<div className="copy-container">
 								<input id="pw-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwArgs)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-args" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -332,6 +357,7 @@ function Component()
 							Lock Script Hash
 							<div className="copy-container">
 								<input id="pw-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.PwLockHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#pw-lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#pw-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -344,6 +370,7 @@ function Component()
 							Nervos CKB Address
 							<div className="copy-container">
 								<input id="acp-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#acp-ckb-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#acp-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -353,6 +380,7 @@ function Component()
 							Lock Script Code Hash
 							<div className="copy-container">
 								<input id="acp-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpCodeHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#acp-code-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#acp-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -360,6 +388,7 @@ function Component()
 							Lock Script Hash Type
 							<div className="copy-container">
 								<input id="acp-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpHashType)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#acp-hash-type" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#acp-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -367,6 +396,7 @@ function Component()
 							Lock Script Args
 							<div className="copy-container">
 								<input id="acp-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpArgs)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#acp-args" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#acp-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -376,6 +406,7 @@ function Component()
 							Lock Script Hash
 							<div className="copy-container">
 								<input id="acp-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.AcpLockHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#acp-lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#acp-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>

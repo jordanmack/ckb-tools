@@ -38,17 +38,6 @@ enum AddressFlags
 	Testnet,
 }
 
-function showQrCodeModal(e?: React.SyntheticEvent<HTMLButtonElement>)
-{
-	if(e)
-	{
-		e.preventDefault();
-
-		const value = (document.getElementById(e.currentTarget.dataset.target!.substr(1)) as HTMLInputElement).value;
-		Reoverlay.showModal(QrCode, {value});
-	}
-}
-
 async function initPwCore(chain: ChainTypes)
 {
 	const provider = new NullProvider();
@@ -91,6 +80,17 @@ function renderNotes(valid: boolean, inputAddress: Address|null)
 	}
 
 	return html;
+}
+
+function renderQrCode(e?: React.SyntheticEvent<HTMLButtonElement>)
+{
+	if(e)
+	{
+		e.preventDefault();
+
+		const value = (document.getElementById(e.currentTarget.dataset.target!.substr(1)) as HTMLInputElement).value;
+		Reoverlay.showModal(QrCode, {value});
+	}
 }
 
 function Component()
@@ -239,7 +239,7 @@ function Component()
 						{inputAddressLabel}
 						<div className="button-container">
 								<input id="input-address" className={inputAddressClassName} type="text" onChange={handleInputAddressChange} ref={inputAddressRef} placeholder={inputAddressPlaceholder} />
-								<button className="qrcode-button" data-target="#input-address" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="qrcode-button" data-target="#input-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#input-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 						</div>
 					</label>
@@ -263,7 +263,7 @@ function Component()
 							Nervos CKB Address
 							<div className="button-container">
 								<input id="output-address" type="text" readOnly={true} value={getAddressComponent(AddressComponents.CkbAddress)} />
-								<button className="qrcode-button" data-target="#output-address" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="qrcode-button" data-target="#output-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#output-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
@@ -274,7 +274,7 @@ function Component()
 						Lock Script Code Hash
 						<div className="button-container">
 							<input id="code-hash" type="text" readOnly={true} value={getAddressComponent(AddressComponents.CodeHash)} />
-							<button className="qrcode-button" data-target="#code-hash" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+							<button className="qrcode-button" data-target="#code-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 							<button className="copy-button" data-clipboard-target="#code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 						</div>
 					</label>
@@ -282,7 +282,7 @@ function Component()
 						Lock Script Hash Type
 						<div className="button-container">
 							<input id="hash-type" type="text" readOnly={true} value={getAddressComponent(AddressComponents.HashType)} />
-							<button className="qrcode-button" data-target="#hash-type" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+							<button className="qrcode-button" data-target="#hash-type" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 							<button className="copy-button" data-clipboard-target="#hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 						</div>
 					</label>
@@ -290,7 +290,7 @@ function Component()
 						Lock Script Args
 						<div className="button-container">
 							<input id="args" type="text" readOnly={true} value={getAddressComponent(AddressComponents.Args)} />
-							<button className="qrcode-button" data-target="#args" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+							<button className="qrcode-button" data-target="#args" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 							<button className="copy-button" data-clipboard-target="#args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 						</div>
 					</label>
@@ -300,7 +300,7 @@ function Component()
 						Lock Script Hash
 						<div className="button-container">
 							<input id="lock-hash" type="text" readOnly={true} value={getAddressComponent(AddressComponents.LockHash)} />
-							<button className="qrcode-button" data-target="#lock-hash" onClick={showQrCodeModal} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+							<button className="qrcode-button" data-target="#lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 							<button className="copy-button" data-clipboard-target="#lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 						</div>
 					</label>
