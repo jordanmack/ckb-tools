@@ -224,7 +224,10 @@ function Component()
 				<section className="input-address">
 					<label title={inputAddressTitle}>
 						{inputAddressLabel}
-						<input id="input-address" className={inputAddressClassName} type="text" onChange={handleInputAddressChange} ref={inputAddressRef} placeholder={inputAddressPlaceholder} />
+						<div className="copy-container">
+								<input id="input-address" className={inputAddressClassName} type="text" onChange={handleInputAddressChange} ref={inputAddressRef} placeholder={inputAddressPlaceholder} />
+								<button className="copy-button" data-clipboard-target="#input-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+						</div>
 					</label>
 				</section>
 				{ (inputAddressType===AddressType.eth) &&
