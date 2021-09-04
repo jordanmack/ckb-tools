@@ -18,10 +18,10 @@ function Component()
 				Downloading and using this chain data can save many hours when bootstrapping a new instance of a CKB node or a CKB Indexer.
 			</p>
 			<p>
-				You can view the available snapshots and download them on <a href="https://s3.amazonaws.com/cdn.ckb.tools/snapshots.html" target="_blank" rel="noreferrer">Amazon S3</a>.
+				You can view the most recent snapshots <a href="https://cdn-ckb-tools.sfo3.digitaloceanspaces.com/snapshots/snapshots.html?prefix=snapshots/" target="_blank" rel="noreferrer">here</a> and older snapshots <a href="https://s3.amazonaws.com/cdn.ckb.tools/snapshots.html" target="_blank" rel="noreferrer">here</a>.
 			</p>
 			<p>
-				Usage Instructions:
+				Basic Usage Instructions:
 			</p>
 			<ol>
 				<li>Install the software for the CKB node, CKB Indexer, or any application that uses them.</li>
