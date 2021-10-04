@@ -224,10 +224,11 @@ function Component()
 		<main className="generator">
 			<h2>Generator Tool</h2>
 			<p>
-				The Generator tool provides a way to generate private keys and view the common output address formats and associated details.
+				The Generator tool provides a way to generate random private keys and view the various addresses generated from the keys.
+				This provides a very fast way to generate wallets for testing purposes. 
 			</p>
 			<p>
-				This tool is designed for testing purposes only! Do not use this tool to generate addresses to secure funds and assets!
+				This tool is designed for testing purposes only! Do not use this tool to generate addresses to secure real funds and assets!
 			</p>
 			<form id="address-form" onSubmit={()=>false}>
 				{/* <section> */}
