@@ -216,9 +216,9 @@ function Component()
 
 	// Values
 	const inputAddressClassName = (valid) ? 'valid' : 'invalid';
-	const inputAddressPlaceholder = {[AddressType.ckb]: 'Enter a Nervos CKB address to get started. eg: ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37', [AddressType.eth]: 'Enter an Ethereum address to get started. eg: 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'}[inputAddressType];
-	const inputAddressLabel = {[AddressType.ckb]: 'Nervos CKB Address', [AddressType.eth]: 'Ethereum Address'}[inputAddressType];
-	const inputAddressTitle = {[AddressType.ckb]: 'A Nervos CKB address starts with either "ckb" or "ckt".', [AddressType.eth]: 'An Ethereum address starts with "0x" and is 42 characters long.'}[inputAddressType];
+	const inputAddressPlaceholder = {[AddressType.ckb]: 'Enter a Nervos CKB address to get started. eg: ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37', [AddressType.eth]: 'Enter an Ethereum address to get started. eg: 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', [AddressType.eos]: '', [AddressType.tron]: ''}[inputAddressType];
+	const inputAddressLabel = {[AddressType.ckb]: 'Nervos CKB Address', [AddressType.eth]: 'Ethereum Address', [AddressType.eos]: '', [AddressType.tron]: ''}[inputAddressType];
+	const inputAddressTitle = {[AddressType.ckb]: 'A Nervos CKB address starts with either "ckb" or "ckt".', [AddressType.eth]: 'An Ethereum address starts with "0x" and is 42 characters long.', [AddressType.eos]: '', [AddressType.tron]: ''}[inputAddressType];
 
 	const html =
 	(
