@@ -1,4 +1,4 @@
-import PWCore, {Address, Amount, AmountUnit, Builder, Cell, RawTransaction, SUDT, Transaction} from "@lay2/pw-core";
+import PWCore, {Address, Amount, AmountUnit, Builder, Cell, ChainID, RawTransaction, SUDT, Transaction} from "@lay2/pw-core";
 import BasicCollector from "../collectors/BasicCollector";
 
 export default class SudtBurnBuilder extends Builder
@@ -77,7 +77,8 @@ export default class SudtBurnBuilder extends Builder
 		cellDeps.push(PWCore.config.sudtType.cellDep);
 
 		// Generate a transaction and calculate the fee. (The second argument for witness args is needed for more accurate fee calculation.)
-		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [Builder.WITNESS_ARGS.Secp256k1]);
+		const witnessArgs = (PWCore.chainId === ChainID.ckb) ? Builder.WITNESS_ARGS.RawSecp256k1 : Builder.WITNESS_ARGS.Secp256k1;
+		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [witnessArgs]);
 		this.fee = Builder.calcFee(tx);
 
 		// Throw error if the fee is too low.
