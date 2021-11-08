@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import PWCore, {EthProvider, Provider} from '@lay2/pw-core';
 import {toast} from 'react-toastify';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
-import * as _ from 'lodash';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 import Config from '../../config.js';

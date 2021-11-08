@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import React, { useEffect, useState } from 'react'
 
-import { NetworkEnum } from '../../AccountBox/AccountBox.types'
 import AccountFaucetBox from '../../AccountFaucetBox/AccountFaucetBox.component'
 import ModalHeader from '../../ModalHeader'
 import Button from '../../buttons/Button'

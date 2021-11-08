@@ -4,7 +4,7 @@ import { Box, CircularProgress, Typography, useTheme } from '@material-ui/core'
 
 import { IModalHeaderProps } from './ModalHeader.types'
 
-const CloseIcon: any = (props: any) => <img src="close.svg" {...props} />
+const CloseIcon: any = (props: any) => <img src="close.svg" alt="" {...props} />
 
 const ModalHeader: React.FC<IModalHeaderProps> = ({
   title,
@@ -41,6 +41,7 @@ const ModalHeader: React.FC<IModalHeaderProps> = ({
             <img
               style={{ height: 48, width: 48, marginBottom: spacing(2) }}
               src={icon}
+              alt=""
             />
           )}
 
