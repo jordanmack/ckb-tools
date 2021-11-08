@@ -14,7 +14,7 @@ import { ICreateNervosAccountModalProps } from './CreateNervosAccountModal.types
 
 const branchIcon = 'wallet.svg';
 
-const CreateNervosAccountModal: React.FC<any> = ({
+const CreateNervosAccountModal: React.FC<ICreateNervosAccountModalProps> = ({
   open,
   title,
   text,
@@ -23,16 +23,20 @@ const CreateNervosAccountModal: React.FC<any> = ({
   faucetAddress,
   handleClose,
   handleCreateNervosAccount,
+  network
 }) => {
   const [clicked, setClicked] = useState(false)
   const { spacing, palette } = useTheme()
   const address = {
-    network: NetworkEnum.Layer1Testnet,
+    network,
     address: walletAddress,
     explorerUrl: faucetAddress,
   }
   const creatingNervosAccount = () => {
-    handleCreateNervosAccount(), setClicked(true)
+    if (handleCreateNervosAccount) {
+      handleCreateNervosAccount();
+    }
+    setClicked(true);
   }
   useEffect(() => {
     error ? setClicked(false) : null

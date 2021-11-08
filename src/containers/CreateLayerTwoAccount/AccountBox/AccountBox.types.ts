@@ -3,6 +3,7 @@ export enum NetworkEnum {
   CKB = 'CKB',
   Godwoken = 'Godwoken',
   Faucet = 'Faucet',
+  Layer1Mainnet = 'Layer 1 Mainnet',
   Layer1Testnet = 'Layer 1 Testnet Faucet'
 }
 

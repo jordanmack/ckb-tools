@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import PWCore, {EthProvider, Provider} from '@lay2/pw-core';
 import {toast} from 'react-toastify';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
@@ -10,10 +10,11 @@ import {ChainTypes, ChainTypeString} from '../../common/ts/Types';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreateNervosAccountModal from './modals/CreateNervosAccountModal/index';
 import BasicCollector from '../../collectors/BasicCollector';
-import { AddressTranslator } from 'nervos-godwoken-integration';
+import { AddressTranslator, IAddressTranslatorConfig } from 'nervos-godwoken-integration';
 import { ThemeProvider } from './styles/theme/index';
 
 import './CreateLayerTwoAccount.scss';
+import { NetworkEnum } from './AccountBox/AccountBox.types';
 
 interface PwObject
 {
@@ -22,6 +23,28 @@ interface PwObject
 	provider: Provider,
 }
 
+const TESTNET_L2_RPC_URL = 'https://godwoken-testnet-web3-rpc.ckbapp.dev/';
+
+const MAINNET_CONFIG: IAddressTranslatorConfig = {
+	CKB_URL: 'https://rpc.ckb.tools/',
+	INDEXER_URL: 'https://indexer.ckb.tools/',
+	RPC_URL: 'https://mainnet.godwoken.io/rpc',
+	deposit_lock_script_type_hash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
+	eth_account_lock_script_type_hash: '0x1563080d175bf8ddd44a48e850cecf0c0b4575835756eb5ffd53ad830931b9f9',
+	portal_wallet_lock_hash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
+	rollup_type_hash: '0x40d73f0d3c561fcaae330eabc030d8d96a9d0af36d0c5114883658a350cb9e3b',
+	rollup_type_script: {
+		code_hash: '0xa9267ff5a16f38aa9382608eb9022883a78e6a40855107bb59f8406cce00e981',
+		hash_type: 'type',
+		args: '0x2d8d67c8d73453c1a6d6d600e491b303910802e0cc90a709da9b15d26c5c48b3'
+	}
+};
+
+const TESTNET_MESSAGE = "First, please transfer at least 470 CKB to your account (copy your Layer 1 address into faucet and request funds) and then create a new account by pressing the CREATE ACCOUNT button.";
+const MAINNET_MESSAGE = "First, please transfer at least 470 CKB to your account and then create a new account by pressing the CREATE ACCOUNT button.";
+
+const TESTNET_FAUCET = 'https://faucet.nervos.org/';
+const MAINNET_EXPLORER = 'https://explorer.nervos.org/address/';
 
 function Component()
 {
@@ -29,10 +52,12 @@ function Component()
 	const [ckbAddress, setCkbAddress] = useState<string | null>(null);
 	const [pw, setPw] = useState<PwObject|null>(null);
 	const [loading, setLoading] = useState(true);
-	const [chainType] = useState(ChainTypes.testnet);
+	const [chainType, setChainType] = useState(ChainTypes.testnet);
 	const [layer2Balance, setLayer2Balance] = useState<number | null>(null);
 	const [modalError, setModalError] = useState<string | null>(null);
 	const [waitingForAccountCreation, setWaitingForAccountCreation] = useState(false);
+
+	const isMainnet = chainType === ChainTypes.mainnet;
 
 	async function initPwCore(chainType: ChainTypes)
 {
@@ -44,7 +69,7 @@ function Component()
 }
 
 const fetchConnectedAccountBalance = useCallback(async function () {
-	const response = await fetch("https://godwoken-testnet-web3-rpc.ckbapp.dev/", {
+	const response = await fetch(isMainnet ? MAINNET_CONFIG.RPC_URL : TESTNET_L2_RPC_URL, {
 		method: 'POST',
 		"headers": {
 			"Accept": "application/json",
@@ -62,25 +87,21 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 	const json = await response.json();
 
 	return parseInt(json.result);
-}, [pw?.provider.address.addressString]);
+}, [pw?.provider.address.addressString, isMainnet]);
 
 	useEffect(()=>
 	{
-		detectEthereumProvider()
-		.then(function(provider)
-		{
-			if(provider)
-			{
-				initPwCore(chainType)
-				.then((pwValues) =>
-				{
-					setLoading(true);
-					setPw(pwValues);
-				});
-			}
-			else
+		(async () => {
+			const provider = await detectEthereumProvider();
+
+			if (provider) {
+				const pwValues = await initPwCore(chainType);
+				
+				setPw(pwValues);
+			} else {
 				alert('A MetaMask compatible browser extension was not detected.\nThis tool will not function without one installed.');
-		});
+			}
+		})();
 	}, [chainType, setPw]);
 
 	useEffect(() => {
@@ -96,6 +117,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 		}
 
 		(async () => {
+			setLoading(true);
 			const balance = await fetchConnectedAccountBalance();
 			setLayer2Balance(balance);
 			setLoading(false);
@@ -107,7 +129,10 @@ const fetchConnectedAccountBalance = useCallback(async function () {
     setOpen(true)
   }
 
-  const handleChainChanged = () => {};
+  const handleChainChanged = (value: ChainTypes) => {
+	setChainType(value);
+	setLayer2Balance(null);
+  };
 
 	return <main className="create-l2-account">
 		{loading && <LoadingSpinner />}
@@ -117,6 +142,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 							<SegmentedControl name="chain-type" setValue={handleChainChanged} options={
 								[
 									{label: 'Testnet', value: ChainTypes.testnet, default: true},
+									{label: 'Mainnet', value: ChainTypes.mainnet},
 								]
 							} />
 						</label>
@@ -143,11 +169,12 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 	  
 	  <ThemeProvider>
       <CreateNervosAccountModal
+	  network={isMainnet ? NetworkEnum.Layer1Mainnet : NetworkEnum.Layer1Testnet}
 	  title="Create Nervos Layer 2 Account"
-	  text="First, please transfer at least 461 CKB to your account (copy your Layer 1 address into faucet and request funds) and then create a new account by pressing the CREATE ACCOUNT button."
-	  walletAddress={ckbAddress}
-	  error={modalError}
-	  faucetAddress="https://faucet.nervos.org/"
+	  text={isMainnet ? MAINNET_MESSAGE : TESTNET_MESSAGE}
+	  walletAddress={ckbAddress ?? undefined}
+	  error={modalError ?? undefined}
+	  faucetAddress={isMainnet ? `${MAINNET_EXPLORER}${ckbAddress}` : TESTNET_FAUCET}
         open={open}
         handleClose={() => {
 			setOpen(false);
@@ -155,7 +182,9 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 		}}
 		handleCreateNervosAccount={async () => {
 				try {
-					const addressTranslator = new AddressTranslator();
+					let config = isMainnet ? MAINNET_CONFIG : undefined;
+					const addressTranslator = new AddressTranslator(config);
+
 					await addressTranslator.createLayer2Address(pw.provider.address.addressString);
 
 					setOpen(false);

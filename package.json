@@ -23,7 +23,7 @@
     "hookrouter": "^1.2.5",
     "include-media": "^1.4.10",
     "lodash": "^4.17.21",
-    "nervos-godwoken-integration": "0.0.12",
+    "nervos-godwoken-integration": "0.0.13",
     "node-sass": "^6.0.1",
     "primer-tooltips": "^2.0.0",
     "qrcode.react": "^1.0.1",

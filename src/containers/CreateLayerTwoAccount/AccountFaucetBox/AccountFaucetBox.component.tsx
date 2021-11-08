@@ -8,7 +8,7 @@ import FilterNoneOutlinedIcon from '@material-ui/icons/FilterNoneOutlined'
 import LinkIcon from '@material-ui/icons/Link'
 
 import { messages } from '../AccountBox/AccountBox.messages'
-import { IAccountBox } from '../AccountBox/AccountBox.types'
+import { IAccountBox, NetworkEnum } from '../AccountBox/AccountBox.types'
 
 const AccountFaucetBox: React.FC<IAccountBox> = ({
   address,
@@ -68,7 +68,7 @@ const AccountFaucetBox: React.FC<IAccountBox> = ({
         color="primary"
         startIcon={<LinkIcon />}
       >
-        {`Go to ${network} Nervos`}
+        {`Go to ${network}${network === NetworkEnum.Layer1Mainnet ? ' Explorer' : ''}`}
       </Button>
     </Box>
   )
