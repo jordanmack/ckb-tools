@@ -10,6 +10,7 @@ import Generator from '../Generator/Generator';
 import Header from '../../components/Header/Header';
 import Home from '../Home/Home';
 import Sudt from '../Sudt/Sudt';
+import CreateLayerTwoAccount from '../CreateLayerTwoAccount/CreateLayerTwoAccount';
 
 const routes =
 {
@@ -20,6 +21,7 @@ const routes =
 	'/contact': () => <Contact />,
 	'/generator': () => <Generator />,
 	'/sudt': () => <Sudt />,
+	'/create-layer2-account': () => <CreateLayerTwoAccount />,
 };
 
 function App()
