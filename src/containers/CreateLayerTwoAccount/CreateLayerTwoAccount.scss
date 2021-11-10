@@ -1,0 +1,20 @@
+@import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
+
+main.create-l2-account {
+    section.chain-type
+	{
+		margin-bottom: $margin-default;
+
+		.segmented-control
+		{
+			margin: 0;
+			transition-duration: 0.2s;
+	
+			label
+			{
+				color: $color-nervos-green;
+			}
+		}
+	}
+}

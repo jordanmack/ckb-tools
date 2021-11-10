@@ -30,6 +30,7 @@ function Component()
 				<li><A href="/bootstrap" className={(currentPath==='/bootstrap')?'active':''} title="Bootstrap a Testnet Node">Bootstrap</A></li>
 				<li><A href="/generator" className={(currentPath==='/generator')?'active':''} title="Generator Tool">Generator</A></li>
 				<li><A href="/sudt" className={(currentPath==='/sudt')?'active':''} title="SUDT Tool">SUDT</A></li>
+				<li><A href="/create-layer2-account" className={(currentPath==='/create-layer2-account')?'active':''} title="Create Layer 2 Account">Create Layer 2 Account</A></li>
 			</ul>
 			<ul className="menu2">
 				<li><A href="/about" className={(currentPath==='/about')?'active':''} title="About"><i className="fas fa-info-circle"></i></A></li>

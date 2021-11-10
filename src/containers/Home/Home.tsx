@@ -19,6 +19,7 @@ function Component()
 				<li><A href="/bootstrap">Bootstrap</A> - Recent snapshots of the Testnet chain data to speed up the initial sync.</li>
 				<li><A href="/generator">Generator Tool</A> - A tool to generate Testnet private keys and addresses.</li>
 				<li><A href="/sudt">SUDT Tool</A> - A tool to create SUDT tokens on the Testnet using MetaMask.</li>
+				<li><A href="/create-layer2-account">Create Layer 2 Account Tool</A> - A tool to create Layer 2 EVM account on both Testnet and Mainnet using MetaMask.</li>
 			</ul>
 			<p>
 				Note: In order to use these tools you must have <a href="https://metamask.io/" target="_blank" rel="noreferrer">MetaMask</a> installed.
