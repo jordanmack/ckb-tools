@@ -80,12 +80,6 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       return;
     }
 
-    console.log({
-      minimum,
-      desiredAmount,
-      amountHigherThanMinimum,
-    });
-
     const rpc = new RPC(CONFIG.testnet.godwoken.rpcUrl);
 
     const godwoker = new Godwoker(CONFIG.testnet.godwoken.rpcUrl);
@@ -168,7 +162,7 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       </button>
       <br />
       <br />
-      {withdrawalRequests?.length > 0 && (
+      {!!withdrawalRequests && withdrawalRequests.length > 0 && (
         <>
           <table className="withdrawal-table">
             <thead>

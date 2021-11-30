@@ -1,6 +1,6 @@
 import { Cell, Hash, HexNumber, HexString } from "@ckb-lumos/base";
 import { minimalCellCapacity } from "@ckb-lumos/helpers";
-import { core } from '@polyjuice-provider/repo/packages/godwoken';
+import { core } from '@polyjuice-provider/godwoken';
 import {
   WithdrawalLockArgs,
 } from "./base/types";
@@ -8,7 +8,7 @@ import { Reader } from "ckb-js-toolkit";
 import { Address, HashType, ScriptType, SnakeScript } from "@lay2/pw-core";
 import { CkbIndexer } from "./indexer-remote";
 import { NormalizeWithdrawalLockArgs } from "./base/normalizers";
-import { SerializeWithdrawalLockArgs } from "@polyjuice-provider/repo/packages/godwoken/schemas";
+import { SerializeWithdrawalLockArgs } from "@polyjuice-provider/godwoken/schemas";
 import CONFIG from '../../../config';
 
 export interface WithdrawalRequest {
@@ -91,7 +91,7 @@ export async function getLastFinalizedBlockNumber(rollupTypeScript: SnakeScript)
     break;
   }
 
-  if (rollup_cell === null) {
+  if (rollup_cell === null || typeof(rollup_cell) === 'undefined') {
     throw new Error('rollup_cell not found');
   }
 

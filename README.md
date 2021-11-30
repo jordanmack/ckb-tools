@@ -30,7 +30,6 @@ You will also need to delete the following file due to a problem in the NPM pack
 
 ```sh
 rm -f node_modules/hookrouter/dist/index.d.ts
-cd node_modules/@polyjuice-provider/repo && npm i && npm run build
 ```
 
 ### Configure
