@@ -71,8 +71,6 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
     );
     const desiredAmount = new Amount(amount, AmountUnit.ckb);
 
-    const amountHigherThanMinimum = desiredAmount.gt(minimum);
-
     if (desiredAmount.lt(minimum)) {
       toast.error(
         `Too low amount to withdraw. Minimum is: ${minimum.toString()} CKB.`
