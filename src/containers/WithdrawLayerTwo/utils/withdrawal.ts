@@ -14,7 +14,7 @@ import CONFIG from '../../../config';
 export interface WithdrawalRequest {
 	amount: bigint;
 	withdrawalBlockNumber: bigint;
-  cell: any;
+  cell: Cell;
 }
 
 export function minimalWithdrawalCapacity(isSudt: boolean): HexNumber {

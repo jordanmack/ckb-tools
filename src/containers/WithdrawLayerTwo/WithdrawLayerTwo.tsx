@@ -4,6 +4,9 @@ import PWCore, {
   AddressType,
   Amount,
   AmountUnit,
+  CellDep,
+  DepType,
+  OutPoint,
   Provider,
   Reader,
   SnakeScript,
@@ -26,6 +29,8 @@ import { NormalizeWithdrawalRequest } from "./utils/base/normalizers";
 import CONFIG from "../../config";
 import BasicCollector from "../../collectors/BasicCollector";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import GodwokenUnlockBuilder from "../../builders/GodwokenUnlockBuilder";
+import { ChainTypes, ChainTypeString } from "../../common/ts/Types";
 
 interface PwObject {
   collector: BasicCollector;
@@ -141,6 +146,20 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
     toast.success("Withdrawal successfully requested!");
   }
 
+  async function unlock(request: WithdrawalRequest, ckbAddress: Address, pw: PwObject) {
+  	const collector = new BasicCollector(CONFIG[ChainTypes[ChainTypes.testnet] as ChainTypeString].ckbIndexerUrl);
+	  const fee = new Amount('10000', AmountUnit.shannon);
+    const withdrawalLockCellDep = new CellDep(DepType.code, new OutPoint('0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828', '0x0'));
+    const rollupCellDep = new CellDep(DepType.code, new OutPoint('0x850e6c33d845356163c736bf8234856de0b0a8e2ad0c5227fc12058b8b602623', '0x0'));
+    const builder = new GodwokenUnlockBuilder(ckbAddress, request, collector, fee, withdrawalLockCellDep, rollupCellDep);
+
+    const transaction = await builder.build();
+    console.info(transaction);
+
+    const txId = await pw.pwCore.sendTransaction(transaction);
+    console.log(`Transaction submitted: ${txId}`);
+  }
+
   return (
     <div>
       {loading && <LoadingSpinner />}
@@ -175,13 +194,13 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
                 <tr key={index}>
                   <td>{request.amount.toString()}</td>
                   <td>{request.withdrawalBlockNumber.toString()}</td>
-                  <td>Not available</td>
+                  <td>{lastFinalizedBlock >= request.withdrawalBlockNumber ? <button onClick={() => unlock(request, pw?.provider.address, pw)}>Unlock</button> : 'Not available'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           <br />
-          Last finalized block: {Number(lastFinalizedBlock)}. Withdrawal block needs to be higher or equal to it.
+          Last finalized block: {Number(lastFinalizedBlock)}. Withdrawal block needs to be higher or equal to it for the funds to be unlocked.
         </>
       )}
       {withdrawalRequests?.length === 0 && (
