@@ -5,7 +5,7 @@ import {
   WithdrawalLockArgs,
 } from "./base/types";
 import { Reader } from "ckb-js-toolkit";
-import { Address, HashType, ScriptType, SnakeScript } from "@lay2/pw-core";
+import { Address, Amount, AmountUnit, Cell as PwCell, HashType, OutPoint, Script, ScriptType, SnakeScript } from "@lay2/pw-core";
 import { CkbIndexer } from "./indexer-remote";
 import { NormalizeWithdrawalLockArgs } from "./base/normalizers";
 import { SerializeWithdrawalLockArgs } from "@polyjuice-provider/godwoken/schemas";
@@ -73,7 +73,7 @@ export function minimalWithdrawalCapacity(isSudt: boolean): HexNumber {
   return "0x" + capacity.toString(16);
 }
 
-export async function getLastFinalizedBlockNumber(rollupTypeScript: SnakeScript) {
+export async function getRollupCellWithState(rollupTypeScript: SnakeScript) {
   const indexer = new CkbIndexer(
     CONFIG.testnet.ckbRpcUrl,
     CONFIG.testnet.ckbIndexerUrl
@@ -85,22 +85,33 @@ export async function getLastFinalizedBlockNumber(rollupTypeScript: SnakeScript)
     script_type: ScriptType.type
   });
 
-  let rollup_cell: Cell | undefined = undefined;
+  let rollupCell: PwCell | undefined = undefined;
   for await (const cell of rollupCells) {
-    rollup_cell = cell;
+    const lock = Script.fromRPC(cell.cell_output.lock);
+    if (!lock || !cell.out_point) {
+      throw new Error('Rollup cell has no lock script or out point.');
+    }
+    
+    rollupCell = new PwCell(
+        new Amount(cell.cell_output.capacity, AmountUnit.shannon),
+        lock,
+        Script.fromRPC(cell.cell_output.type),
+        new OutPoint(cell.out_point.tx_hash, cell.out_point.index),
+        cell.data
+      );
     break;
   }
 
-  if (rollup_cell === null || typeof(rollup_cell) === 'undefined') {
-    throw new Error('rollup_cell not found');
+  if (rollupCell === null || typeof(rollupCell) === 'undefined') {
+    throw new Error('Rollup cell not found.');
   }
 
-  const globalState = new core.GlobalState(new Reader(rollup_cell.data));
-  const last_finalized_block_number = globalState
+  const globalState = new core.GlobalState(new Reader(rollupCell.getHexData()));
+  const lastFinalizedBlockNumber = globalState
     .getLastFinalizedBlockNumber()
     .toLittleEndianBigUint64();
 
-  return last_finalized_block_number;
+  return { rollupCell, lastFinalizedBlockNumber };
 }
 
  export async function fetchWithdrawalRequests(

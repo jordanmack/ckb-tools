@@ -21,6 +21,10 @@ const config =
 			withdrawalLockScript: {
 				code_hash: '0x170ef156e9f6132dbca6069dfd3e436f7d91c29d3ac7332c4b33e633b6a299b5',
 				hash_type: 'type'
+			},
+			withdrawalLockCellDep: {
+				tx_hash: '0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828',
+				index: '0x0'
 			}
 		}
 	},
@@ -43,7 +47,11 @@ const config =
 			creatorAccountId: '0x3',
 			polyjuiceValidatorScriptCodeHash: '0x636b89329db092883883ab5256e435ccabeee07b52091a78be22179636affce8',
 			depositLockScriptTypeHash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
-			portalWalletLockHash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc'
+			portalWalletLockHash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
+			withdrawalLockCellDep: {
+				tx_hash: '',
+				index: ''
+			}
 		}
 	},
 

@@ -2,12 +2,11 @@ import { Cell, Hash, HexNumber, HexString, Script } from "@ckb-lumos/base";
 import { minimalCellCapacity } from "@ckb-lumos/helpers";
 import {
   WithdrawalLockArgs,
-  schemas,
   normalizers,
 } from "../base";
 import { Reader } from "ckb-js-toolkit";
+import { SerializeWithdrawalLockArgs } from "@polyjuice-provider/godwoken/schemas";
 
-const { SerializeWithdrawalLockArgs } = schemas;
 const { NormalizeWithdrawalLockArgs } = normalizers;
 
 export function minimalWithdrawalCapacity(isSudt: boolean): HexNumber {

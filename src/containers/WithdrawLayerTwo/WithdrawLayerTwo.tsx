@@ -5,32 +5,33 @@ import PWCore, {
   Amount,
   AmountUnit,
   CellDep,
+  DefaultSigner,
   DepType,
   OutPoint,
   Provider,
   Reader,
   SnakeScript,
+  transformers,
 } from "@lay2/pw-core";
-import { Godwoker } from "@polyjuice-provider/base";
+import { Godwoker, RequireResult } from "@polyjuice-provider/base";
 import { toast } from "react-toastify";
 
 import './WithdrawalLayerTwo.scss';
 import {
   fetchWithdrawalRequests,
-  getLastFinalizedBlockNumber,
+  getRollupCellWithState,
   minimalWithdrawalCapacity,
   WithdrawalRequest,
 } from "./utils/withdrawal";
 import { generateWithdrawalRequest } from "./utils/transaction";
-import { RPC } from "./utils/rpc/index";
 import { Fee } from "./utils/base/types.js";
-import { SerializeWithdrawalRequest } from "./utils/base/schemas/index";
 import { NormalizeWithdrawalRequest } from "./utils/base/normalizers";
 import CONFIG from "../../config";
 import BasicCollector from "../../collectors/BasicCollector";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import GodwokenUnlockBuilder from "../../builders/GodwokenUnlockBuilder";
 import { ChainTypes, ChainTypeString } from "../../common/ts/Types";
+import { SerializeWithdrawalRequest } from "@polyjuice-provider/godwoken/schemas";
 
 interface PwObject {
   collector: BasicCollector;
@@ -63,7 +64,9 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
         CONFIG.testnet.godwoken.rollupTypeHash
       )
     );
-    setLastFinalizedBlock(await getLastFinalizedBlockNumber(CONFIG.testnet.godwoken.rollupTypeScript as SnakeScript));
+    const rollupData = await getRollupCellWithState(CONFIG.testnet.godwoken.rollupTypeScript as SnakeScript);
+
+    setLastFinalizedBlock(rollupData.lastFinalizedBlockNumber);
     setFetchWithdrawLoading(false);
   }
 
@@ -82,8 +85,6 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       );
       return;
     }
-
-    const rpc = new RPC(CONFIG.testnet.godwoken.rpcUrl);
 
     const godwoker = new Godwoker(CONFIG.testnet.godwoken.rpcUrl);
     await godwoker.init();
@@ -120,7 +121,7 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
     };
 
     const request = await generateWithdrawalRequest(
-      rpc,
+      godwoker,
       address.addressString,
       {
         fromId,
@@ -140,24 +141,42 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       SerializeWithdrawalRequest(normalizedRequest)
     ).serializeJson();
 
-    await rpc.gw.submit_withdrawal_request(data);
+    await godwoker.jsonRPC('gw_submit_withdrawal_request', [data], '', RequireResult.canBeEmpty);
 
     setCreateWithdrawRequestLoading(false);
     toast.success("Withdrawal successfully requested!");
   }
 
   async function unlock(request: WithdrawalRequest, ckbAddress: Address, pw: PwObject) {
-  	const collector = new BasicCollector(CONFIG[ChainTypes[ChainTypes.testnet] as ChainTypeString].ckbIndexerUrl);
+    const { rollupCell } = await getRollupCellWithState(CONFIG.testnet.godwoken.rollupTypeScript as SnakeScript);
+
+    if (!rollupCell?.outPoint) {
+      throw new Error('Rollup cell missing.');
+    }
+
+    const testnetConfig = CONFIG[ChainTypes[ChainTypes.testnet] as ChainTypeString];
+
+  	const collector = new BasicCollector(testnetConfig.ckbIndexerUrl);
 	  const fee = new Amount('10000', AmountUnit.shannon);
-    const withdrawalLockCellDep = new CellDep(DepType.code, new OutPoint('0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828', '0x0'));
-    const rollupCellDep = new CellDep(DepType.code, new OutPoint('0x850e6c33d845356163c736bf8234856de0b0a8e2ad0c5227fc12058b8b602623', '0x0'));
+    const withdrawalLockCellDep = new CellDep(DepType.code, new OutPoint(testnetConfig.godwoken.withdrawalLockCellDep.tx_hash, testnetConfig.godwoken.withdrawalLockCellDep.index));
+    const rollupCellDep = new CellDep(DepType.code, rollupCell?.outPoint);
     const builder = new GodwokenUnlockBuilder(ckbAddress, request, collector, fee, withdrawalLockCellDep, rollupCellDep);
 
     const transaction = await builder.build();
-    console.info(transaction);
+    transaction.validate();
 
-    const txId = await pw.pwCore.sendTransaction(transaction);
-    console.log(`Transaction submitted: ${txId}`);
+    const signer = new DefaultSigner(pw.provider);
+    const signedTx = await signer.sign(transaction);
+
+    signedTx.witnesses[0] = signedTx.witnessArgs[0] as string;
+
+    try {
+      const txId = await pw.pwCore.rpc.send_transaction(transformers.TransformTransaction(signedTx), 'passthrough');
+
+      toast.success(`Transaction submitted: ${txId} (Layer 1 transaction)`);
+    } catch (error) {
+      toast.error(`Unlock failed. Please try again.`);
+    }
   }
 
   return (

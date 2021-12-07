@@ -1,17 +1,9 @@
-import { normalizers, Reader } from "ckb-js-toolkit";
+import { Reader } from "ckb-js-toolkit";
 import {
   RawWithdrawalRequest,
-  CreateAccount,
-  SudtTransfer,
   WithdrawalLockArgs,
-  SudtQuery,
   Fee,
-  RawL2Transaction,
-  CustodianLockArgs,
-  DepositRequest,
-  L2Transaction,
   WithdrawalRequest,
-  DepositLockArgs,
   UnlockWithdrawalViaFinalize,
 } from "./types";
 
@@ -80,62 +72,6 @@ function toNormalize(normalize: Function) {
   };
 }
 
-export function NormalizeDepositRequest(
-  request: DepositRequest,
-  { debugPath = "deposit_request" } = {}
-) {
-  return normalizeObject(debugPath, request, {
-    capacity: normalizeHexNumber(8),
-    amount: normalizeHexNumber(16),
-    sudt_script_hash: normalizeRawData(32),
-    script: toNormalize(normalizers.NormalizeScript),
-  });
-}
-
-export function NormalizeDepositLockArgs(
-  args: DepositLockArgs,
-  { debugPath = "deposit_lock_args" } = {}
-) {
-  return normalizeObject(debugPath, args, {
-    owner_lock_hash: normalizeRawData(32),
-    layer2_lock: toNormalize(normalizers.NormalizeScript),
-    cancel_timeout: normalizeHexNumber(8),
-  });
-}
-
-export function NormalizeCustodianLockArgs(
-  args: CustodianLockArgs,
-  { debugPath = "custondian_lock_args" } = {}
-) {
-  return normalizeObject(debugPath, args, {
-    deposit_block_hash: normalizeRawData(32),
-    deposit_block_number: normalizeHexNumber(8),
-    deposit_lock_args: toNormalize(NormalizeDepositLockArgs),
-  });
-}
-
-export function NormalizeRawL2Transaction(
-  rawL2Transaction: RawL2Transaction,
-  { debugPath = "raw_l2_transaction" } = {}
-) {
-  return normalizeObject(debugPath, rawL2Transaction, {
-    from_id: normalizeHexNumber(4),
-    to_id: normalizeHexNumber(4),
-    nonce: normalizeHexNumber(4),
-    args: normalizeRawData(-1),
-  });
-}
-
-export function NormalizeL2Transaction(
-  l2Transaction: L2Transaction,
-  { debugPath = "l2_transaction" } = {}
-) {
-  return normalizeObject(debugPath, l2Transaction, {
-    raw: toNormalize(NormalizeRawL2Transaction),
-    signature: normalizeRawData(-1),
-  });
-}
-
 export function NormalizeRawWithdrawalRequest(
   raw_request: RawWithdrawalRequest,
   { debugPath = "raw_withdrawal_request" } = {}
@@ -168,36 +104,6 @@ export function NormalizeFee(fee: Fee, { debugPath = "fee" } = {}) {
   return normalizeObject(debugPath, fee, {
     sudt_id: normalizeHexNumber(4),
     amount: normalizeHexNumber(16),
-  });
-}
-
-export function NormalizeCreateAccount(
-  createAccount: CreateAccount,
-  { debugPath = "create_account" } = {}
-) {
-  return normalizeObject(debugPath, createAccount, {
-    script: toNormalize(normalizers.NormalizeScript),
-    fee: toNormalize(NormalizeFee),
-  });
-}
-
-export function NormalizeSUDTQuery(
-  sudt_query: SudtQuery,
-  { debugPath = "sudt_query" } = {}
-) {
-  return normalizeObject(debugPath, sudt_query, {
-    short_address: normalizeRawData(20),
-  });
-}
-
-export function NormalizeSUDTTransfer(
-  sudt_transfer: SudtTransfer,
-  { debugPath = "sudt_transfer" } = {}
-) {
-  return normalizeObject(debugPath, sudt_transfer, {
-    to: normalizeRawData(20),
-    amount: normalizeHexNumber(16),
-    fee: normalizeHexNumber(16),
   });
 }
 

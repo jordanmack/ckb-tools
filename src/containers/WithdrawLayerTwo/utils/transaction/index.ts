@@ -1,19 +1,19 @@
 import { Hash, HexNumber, HexString, Script, utils } from "@ckb-lumos/base";
 import {
   RawL2Transaction,
-  schemas,
   normalizers,
   RawWithdrawalRequest,
   WithdrawalRequest,
   Fee,
 } from "../base";
-import { RPC } from "../rpc";
 import { Reader } from "ckb-js-toolkit";
 import keccak256 from "keccak256";
 import { withdrawal } from "../utils";
+import { normalizer } from "@polyjuice-provider/godwoken";
+import { Godwoker, serializeRawL2Transaction } from "@polyjuice-provider/base";
+import { SerializeRawWithdrawalRequest } from "@polyjuice-provider/godwoken/schemas";
 
-const { SerializeRawL2Transaction } = schemas;
-const { NormalizeRawL2Transaction } = normalizers;
+const { NormalizeRawL2Transaction } = normalizer;
 
 export function generateTransactionMessage(
   rawL2Transaction: RawL2Transaction,
@@ -22,7 +22,7 @@ export function generateTransactionMessage(
   rollupTypeHash: Hash
 ): HexString {
   const rawTxHex = new Reader(
-    SerializeRawL2Transaction(NormalizeRawL2Transaction(rawL2Transaction))
+    serializeRawL2Transaction(NormalizeRawL2Transaction(rawL2Transaction))
   ).serializeJson();
 
   const data =
@@ -51,7 +51,7 @@ export async function signMessageEthereum(message: Hash, address: string): Promi
 }
 
 export async function generateWithdrawalRequest(
-  godwokenClient: RPC,
+  godwokenClient: Godwoker,
   ethereumAddress: string,
   {
     fromId,
@@ -104,7 +104,7 @@ export async function generateWithdrawalRequest(
   };
   const accountScriptHash = utils.computeScriptHash(script);
 
-  const nonce: HexNumber = await godwokenClient.gw.get_nonce(fromId);
+  const nonce: HexNumber = await godwokenClient.getNonce(Number(fromId));
 
   const rawWithdrawalRequest: RawWithdrawalRequest = {
     nonce,
@@ -139,7 +139,7 @@ export function generateWithdrawalMessage(
   rollupTypeHash: Hash
 ): HexString {
   const raw_request_data = new Reader(
-    schemas.SerializeRawWithdrawalRequest(
+    SerializeRawWithdrawalRequest(
       normalizers.NormalizeRawWithdrawalRequest(raw_request)
     )
   ).serializeJson();

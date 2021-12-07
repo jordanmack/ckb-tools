@@ -1,6 +1,5 @@
-import PWCore, {Address, Amount, AmountUnit, Builder, Cell, CellDep, ChainID, OutPoint, RawTransaction, Reader, Script, Transaction} from "@lay2/pw-core";
-import { SerializeUnlockWithdrawalViaFinalize,  } from "@polyjuice-provider/godwoken/schemas";
-// import { NormalizeUnlockWithdrawalViaFinalize } from "@polyjuice-provider/godwoken/lib/normalizer";
+import PWCore, {Address, Amount, AmountUnit, Builder, Cell, CellDep, normalizers, OutPoint, RawTransaction, Reader, Script, SerializeWitnessArgs, Transaction, WitnessArgs} from "@lay2/pw-core";
+import { SerializeUnlockWithdrawalViaFinalize  } from "@polyjuice-provider/godwoken/schemas";
 
 import BasicCollector from "../collectors/BasicCollector";
 import { WithdrawalRequest } from "../containers/WithdrawLayerTwo/utils/withdrawal";
@@ -101,38 +100,35 @@ export default class GodwokenUnlockBuilder extends Builder
 
 		// Add the required cell deps.
 		cellDeps.push(
-            PWCore.config.defaultLock.cellDep,
-            PWCore.config.pwLock.cellDep,
             this.withdrawalLockCellDep,
-            this.rollupCellDep
+            this.rollupCellDep,
+            PWCore.config.defaultLock.cellDep,
+            PWCore.config.pwLock.cellDep
         );
 
 		// Generate a transaction and calculate the fee. (The second argument for witness args is needed for more accurate fee calculation.)
-        // const block_proof = "0x"; // FIXME: fill this field
         const data =
             "0x00000000" +
             new Reader(
                 SerializeUnlockWithdrawalViaFinalize(
                     NormalizeUnlockWithdrawalViaFinalize({})
-                    // NormalizeUnlockWithdrawalViaFinalize({ block_proof })
                 )
             )
             .serializeJson()
             .slice(2);
-        console.log("withdrawal_witness:", data);
-        const withdrawalWitnessArgs = {
+
+        const withdrawalWitnessArgs: WitnessArgs = {
             lock: data,
             input_type: '',
             output_type: ''
         };
-        // const withdrawalWitnessArgs = new Reader(
-        //     SerializeWitnessArgs(
-        //         normalizers.NormalizeWitnessArgs(new_witness_args)
-        //     )
-        // ).serializeJson();
+        const withdrawalWitnessArgsSerialized = new Reader(
+            SerializeWitnessArgs(
+                normalizers.NormalizeWitnessArgs(withdrawalWitnessArgs)
+            )
+        ).serializeJson();
         
-		const witnessArgs = (PWCore.chainId === ChainID.ckb) ? Builder.WITNESS_ARGS.RawSecp256k1 : Builder.WITNESS_ARGS.Secp256k1;
-		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [withdrawalWitnessArgs, witnessArgs]);
+		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [withdrawalWitnessArgsSerialized, Builder.WITNESS_ARGS.Secp256k1]);
 		this.fee = Builder.calcFee(tx);
 
 		// Throw error if the fee is too low.
