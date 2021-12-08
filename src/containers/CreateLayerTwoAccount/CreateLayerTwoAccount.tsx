@@ -3,17 +3,17 @@ import PWCore, {EthProvider, Provider} from '@lay2/pw-core';
 import {toast} from 'react-toastify';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { AddressTranslator, IAddressTranslatorConfig } from 'nervos-godwoken-integration';
 
+import './CreateLayerTwoAccount.scss';
 import Config from '../../config.js';
 import {ChainTypes, ChainTypeString} from '../../common/ts/Types';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreateNervosAccountModal from './modals/CreateNervosAccountModal/index';
 import BasicCollector from '../../collectors/BasicCollector';
-import { AddressTranslator, IAddressTranslatorConfig } from 'nervos-godwoken-integration';
 import { ThemeProvider } from './styles/theme/index';
-
-import './CreateLayerTwoAccount.scss';
 import { NetworkEnum } from './AccountBox/AccountBox.types';
+import { WithdrawLayerTwo } from '../WithdrawLayerTwo/WithdrawLayerTwo';
 
 interface PwObject
 {
@@ -22,53 +22,52 @@ interface PwObject
 	provider: Provider,
 }
 
-const TESTNET_L2_RPC_URL = 'https://godwoken-testnet-web3-rpc.ckbapp.dev/';
-
 const MAINNET_CONFIG: IAddressTranslatorConfig = {
-	CKB_URL: 'https://rpc.ckb.tools/',
-	INDEXER_URL: 'https://indexer.ckb.tools/',
-	RPC_URL: 'https://mainnet.godwoken.io/rpc',
-	deposit_lock_script_type_hash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
-	eth_account_lock_script_type_hash: '0x1563080d175bf8ddd44a48e850cecf0c0b4575835756eb5ffd53ad830931b9f9',
-	portal_wallet_lock_hash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
-	rollup_type_hash: '0x40d73f0d3c561fcaae330eabc030d8d96a9d0af36d0c5114883658a350cb9e3b',
-	rollup_type_script: {
-		code_hash: '0xa9267ff5a16f38aa9382608eb9022883a78e6a40855107bb59f8406cce00e981',
-		hash_type: 'type',
-		args: '0x2d8d67c8d73453c1a6d6d600e491b303910802e0cc90a709da9b15d26c5c48b3'
-	}
+	CKB_URL: Config.mainnet.ckbRpcUrl,
+	INDEXER_URL: Config.mainnet.ckbExplorerUrl,
+	RPC_URL: Config.mainnet.godwoken.rpcUrl,
+	deposit_lock_script_type_hash: Config.mainnet.godwoken.depositLockScriptTypeHash,
+	eth_account_lock_script_type_hash: Config.mainnet.godwoken.ethAccountLockScriptTypeHash,
+	portal_wallet_lock_hash: Config.mainnet.godwoken.portalWalletLockHash,
+	rollup_type_hash: Config.mainnet.godwoken.rollupTypeHash,
+	rollup_type_script: Config.mainnet.godwoken.rollupTypeScript
 };
 
 const TESTNET_MESSAGE = "First, please transfer at least 470 CKB to your account (copy your Layer 1 address into faucet and request funds) and then create a new account by pressing the CREATE ACCOUNT button.";
 const MAINNET_MESSAGE = "First, please transfer at least 470 CKB to your account and then create a new account by pressing the CREATE ACCOUNT button.";
-
-const TESTNET_FAUCET = 'https://faucet.nervos.org/';
-const MAINNET_EXPLORER = 'https://explorer.nervos.org/address/';
 
 function Component()
 {
 	const [open, setOpen] = useState(false)
 	const [ckbAddress, setCkbAddress] = useState<string | null>(null);
 	const [pw, setPw] = useState<PwObject|null>(null);
-	const [loading, setLoading] = useState(true);
+	const [pwLoading, setPwLoading] = useState(false);
+	const [fetchBalanceLoading, setFetchBalanceLoading] = useState(false);
+	const [createAccountLoading, setCreateAccountLoading] = useState(false);
+	
 	const [chainType, setChainType] = useState(ChainTypes.testnet);
 	const [layer2Balance, setLayer2Balance] = useState<number | null>(null);
 	const [modalError, setModalError] = useState<string | null>(null);
 	const [waitingForAccountCreation, setWaitingForAccountCreation] = useState(false);
+	const [withdrawVisibile, setWithdrawVisibility] = useState(false);
 
+	const loading = pwLoading || fetchBalanceLoading || createAccountLoading;
 	const isMainnet = chainType === ChainTypes.mainnet;
 
+	
 	async function initPwCore(chainType: ChainTypes)
 {
+	setPwLoading(true);
 	const provider = new EthProvider();
 	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
 	const pwCore = await new PWCore(Config[ChainTypes[chainType] as ChainTypeString].ckbRpcUrl).init(provider, collector);
+	setPwLoading(false);
 
 	return {pwCore, provider, collector};
 }
 
 const fetchConnectedAccountBalance = useCallback(async function () {
-	const response = await fetch(isMainnet ? MAINNET_CONFIG.RPC_URL : TESTNET_L2_RPC_URL, {
+	const response = await fetch(isMainnet ? MAINNET_CONFIG.RPC_URL : Config.testnet.godwoken.rpcUrl, {
 		method: 'POST',
 		"headers": {
 			"Accept": "application/json",
@@ -116,13 +115,17 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 		}
 
 		(async () => {
-			setLoading(true);
+			setFetchBalanceLoading(true);
 			const balance = await fetchConnectedAccountBalance();
 			setLayer2Balance(balance);
-			setLoading(false);
+			setFetchBalanceLoading(false);
 		})();
 		
 	}, [fetchConnectedAccountBalance, pw?.provider.address.addressString]);
+
+	useEffect(() => {
+		setWithdrawVisibility(false);
+	}, [isMainnet]);
 
   const onClick = () => {
     setOpen(true)
@@ -133,7 +136,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 	setLayer2Balance(null);
   };
 
-	return <main className="create-l2-account">
+return <main className="create-l2-account">
 		{loading && <LoadingSpinner />}
 		<section className="chain-type">
 						<label title='Chain types can be either Mainnet or Testnet.'>
@@ -153,7 +156,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 			{layer2Balance ? <>
 				<div>You already have a Nervos Layer 2 account with CKB.</div>
 			<br/>
-			<div>Your Layer 2 balance is: {layer2Balance ?? 0} Shannons.</div>
+			<div>Your Layer 2 balance is: {layer2Balance ?? 0} Shannon.</div>
 			<div><i>1 Shannon is 1 / 10 ^ 8 of CKB.</i></div>
 			</> : <>
 			{layer2Balance === null ? <>
@@ -173,7 +176,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 	  text={isMainnet ? MAINNET_MESSAGE : TESTNET_MESSAGE}
 	  walletAddress={ckbAddress ?? undefined}
 	  error={modalError ?? undefined}
-	  faucetAddress={isMainnet ? `${MAINNET_EXPLORER}${ckbAddress}` : TESTNET_FAUCET}
+	  faucetAddress={isMainnet ? `${Config.mainnet.ckbExplorerUrl}address/${ckbAddress}` : Config.testnet.faucetUrl}
         open={open}
         handleClose={() => {
 			setOpen(false);
@@ -188,7 +191,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 
 					setOpen(false);
 					setWaitingForAccountCreation(true);
-					setLoading(true);
+					setCreateAccountLoading(true);
 
 					let maxTries = 300;
 					let currentTry = 1;
@@ -209,7 +212,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 					}
 				} finally {
 					setWaitingForAccountCreation(false);
-					setLoading(false);
+					setCreateAccountLoading(false);
 				}
 			
 		}}
@@ -225,8 +228,8 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 			Please connect Ethereum account. Check for "Connect account" modal in your wallet extension.	
 		</div>}
 		
-  
-		
+	{!isMainnet && Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
+	{!isMainnet && withdrawVisibile && pw && <><br/><br/><br/><WithdrawLayerTwo pw={pw} /></>}
 	</main>
 }
 
