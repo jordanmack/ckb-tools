@@ -20,6 +20,7 @@ const config =
 			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
 			withdrawalLockScript: {
 				code_hash: '0x170ef156e9f6132dbca6069dfd3e436f7d91c29d3ac7332c4b33e633b6a299b5',
+				args: '0x',
 				hash_type: 'type'
 			},
 			withdrawalLockCellDep: {
@@ -32,7 +33,7 @@ const config =
 	mainnet:
 	{
 		ckbRpcUrl: '//rpc.ckb.tools',
-		ckbIndexerUrl: '//indexer.ckb.tools',
+		ckbIndexerUrl: '//3.235.223.161:8116',
 		ckbExplorerUrl: '//explorer.nervos.org/',
 
 		godwoken: {
@@ -48,9 +49,14 @@ const config =
 			polyjuiceValidatorScriptCodeHash: '0x636b89329db092883883ab5256e435ccabeee07b52091a78be22179636affce8',
 			depositLockScriptTypeHash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
 			portalWalletLockHash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
+			withdrawalLockScript: {
+				code_hash: '0xf1717ee388b181fcb14352055c00b7ea7cd7c27350ffd1a2dd231e059dde2fed',
+				args: '0x',
+				hash_type: 'type'
+			},
 			withdrawalLockCellDep: {
-				tx_hash: '',
-				index: ''
+				tx_hash: '0x3d727bd8bb1d87ba79638b63bfbf4c9a4feb9ac5ac5a0b356f3aaf4ccb4d3a1c',
+				index: '0x0'
 			}
 		}
 	},

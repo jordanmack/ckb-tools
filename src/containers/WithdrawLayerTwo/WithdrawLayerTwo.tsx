@@ -16,7 +16,7 @@ import PWCore, {
 import { Godwoker, RequireResult } from "@polyjuice-provider/base";
 import { toast } from "react-toastify";
 
-import './WithdrawalLayerTwo.scss';
+import "./WithdrawalLayerTwo.scss";
 import {
   fetchWithdrawalRequests,
   getRollupCellWithState,
@@ -26,7 +26,7 @@ import {
 import { generateWithdrawalRequest } from "./utils/transaction";
 import { Fee } from "./utils/base/types.js";
 import { NormalizeWithdrawalRequest } from "./utils/base/normalizers";
-import CONFIG from "../../config";
+import GLOBAL_CONFIG from "../../config";
 import BasicCollector from "../../collectors/BasicCollector";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import GodwokenUnlockBuilder from "../../builders/GodwokenUnlockBuilder";
@@ -41,9 +41,10 @@ interface PwObject {
 
 interface WithdrawLayerTwoProps {
   pw: PwObject;
+  chainType: ChainTypes;
 }
 
-export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
+export function WithdrawLayerTwo({ pw, chainType }: WithdrawLayerTwoProps) {
   const [withdrawalRequests, setWithdrawalRequests] = useState<
     WithdrawalRequest[] | null
   >(null);
@@ -54,17 +55,25 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
   const [lastFinalizedBlock, setLastFinalizedBlock] = useState(BigInt(0));
 
   const loading = fetchWithdrawRequestsLoading || createWithdrawRequestLoading;
+  const config = GLOBAL_CONFIG[ChainTypes[chainType] as ChainTypeString];
 
   async function fetchWithdrawRequests(address: Address) {
     setFetchWithdrawLoading(true);
-    
+
     setWithdrawalRequests(
       await fetchWithdrawalRequests(
         address,
-        CONFIG.testnet.godwoken.rollupTypeHash
+        config.godwoken.rollupTypeHash,
+        config.godwoken.withdrawalLockScript as SnakeScript,
+        config.ckbRpcUrl,
+        config.ckbIndexerUrl
       )
     );
-    const rollupData = await getRollupCellWithState(CONFIG.testnet.godwoken.rollupTypeScript as SnakeScript);
+    const rollupData = await getRollupCellWithState(
+      config.godwoken.rollupTypeScript as SnakeScript,
+      config.ckbRpcUrl,
+      config.ckbIndexerUrl
+    );
 
     setLastFinalizedBlock(rollupData.lastFinalizedBlockNumber);
     setFetchWithdrawLoading(false);
@@ -86,7 +95,7 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       return;
     }
 
-    const godwoker = new Godwoker(CONFIG.testnet.godwoken.rpcUrl);
+    const godwoker = new Godwoker(config.godwoken.rpcUrl);
     await godwoker.init();
 
     if (address.addressType !== AddressType.eth) {
@@ -109,14 +118,12 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       amount: "0x0",
     };
 
-    const config = {
-      rollupTypeHash: CONFIG.testnet.godwoken.rollupTypeHash,
+    const withdrawalConfig = {
+      rollupTypeHash: config.godwoken.rollupTypeHash,
       polyjuice: {
-        ethAccountLockCodeHash:
-          CONFIG.testnet.godwoken.ethAccountLockScriptTypeHash,
-        creatorAccountId: CONFIG.testnet.godwoken.creatorAccountId,
-        scriptCodeHash:
-          CONFIG.testnet.godwoken.polyjuiceValidatorScriptCodeHash,
+        ethAccountLockCodeHash: config.godwoken.ethAccountLockScriptTypeHash,
+        creatorAccountId: config.godwoken.creatorAccountId,
+        scriptCodeHash: config.godwoken.polyjuiceValidatorScriptCodeHash,
       },
     };
 
@@ -131,7 +138,7 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
         fee,
       },
       {
-        config,
+        config: withdrawalConfig,
       }
     );
 
@@ -141,26 +148,50 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       SerializeWithdrawalRequest(normalizedRequest)
     ).serializeJson();
 
-    await godwoker.jsonRPC('gw_submit_withdrawal_request', [data], '', RequireResult.canBeEmpty);
+    await godwoker.jsonRPC(
+      "gw_submit_withdrawal_request",
+      [data],
+      "",
+      RequireResult.canBeEmpty
+    );
 
     setCreateWithdrawRequestLoading(false);
     toast.success("Withdrawal successfully requested!");
   }
 
-  async function unlock(request: WithdrawalRequest, ckbAddress: Address, pw: PwObject) {
-    const { rollupCell } = await getRollupCellWithState(CONFIG.testnet.godwoken.rollupTypeScript as SnakeScript);
+  async function unlock(
+    request: WithdrawalRequest,
+    ckbAddress: Address,
+    pw: PwObject
+  ) {
+    const { rollupCell } = await getRollupCellWithState(
+      config.godwoken.rollupTypeScript as SnakeScript,
+      config.ckbRpcUrl,
+      config.ckbIndexerUrl
+    );
 
     if (!rollupCell?.outPoint) {
-      throw new Error('Rollup cell missing.');
+      throw new Error("Rollup cell missing.");
     }
 
-    const testnetConfig = CONFIG[ChainTypes[ChainTypes.testnet] as ChainTypeString];
-
-  	const collector = new BasicCollector(testnetConfig.ckbIndexerUrl);
-	  const fee = new Amount('10000', AmountUnit.shannon);
-    const withdrawalLockCellDep = new CellDep(DepType.code, new OutPoint(testnetConfig.godwoken.withdrawalLockCellDep.tx_hash, testnetConfig.godwoken.withdrawalLockCellDep.index));
+    const collector = new BasicCollector(config.ckbIndexerUrl);
+    const fee = new Amount("10000", AmountUnit.shannon);
+    const withdrawalLockCellDep = new CellDep(
+      DepType.code,
+      new OutPoint(
+        config.godwoken.withdrawalLockCellDep.tx_hash,
+        config.godwoken.withdrawalLockCellDep.index
+      )
+    );
     const rollupCellDep = new CellDep(DepType.code, rollupCell?.outPoint);
-    const builder = new GodwokenUnlockBuilder(ckbAddress, request, collector, fee, withdrawalLockCellDep, rollupCellDep);
+    const builder = new GodwokenUnlockBuilder(
+      ckbAddress,
+      request,
+      collector,
+      fee,
+      withdrawalLockCellDep,
+      rollupCellDep
+    );
 
     const transaction = await builder.build();
     transaction.validate();
@@ -171,7 +202,10 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
     signedTx.witnesses[0] = signedTx.witnessArgs[0] as string;
 
     try {
-      const txId = await pw.pwCore.rpc.send_transaction(transformers.TransformTransaction(signedTx), 'passthrough');
+      const txId = await pw.pwCore.rpc.send_transaction(
+        transformers.TransformTransaction(signedTx),
+        "passthrough"
+      );
 
       toast.success(`Transaction submitted: ${txId} (Layer 1 transaction)`);
     } catch (error) {
@@ -184,7 +218,8 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
       {loading && <LoadingSpinner />}
       Withdrawal from Godwoken is a 2 step process. First you have to initiate
       withdrawal by creating withdrawal request. Then you need to wait about 5
-      days to "unlock" the funds and receive them on Layer 1. Fetch pending requests to see if any of them is ready for unlocking.
+      days to "unlock" the funds and receive them on Layer 1. Fetch pending
+      requests to see if any of them is ready for unlocking.
       <br />
       <br />
       <br />
@@ -213,20 +248,29 @@ export function WithdrawLayerTwo({ pw }: WithdrawLayerTwoProps) {
                 <tr key={index}>
                   <td>{request.amount.toString()}</td>
                   <td>{request.withdrawalBlockNumber.toString()}</td>
-                  <td>{lastFinalizedBlock >= request.withdrawalBlockNumber ? <button onClick={() => unlock(request, pw?.provider.address, pw)}>Unlock</button> : 'Not available'}</td>
+                  <td>
+                    {lastFinalizedBlock >= request.withdrawalBlockNumber ? (
+                      <button
+                        onClick={() =>
+                          unlock(request, pw?.provider.address, pw)
+                        }
+                      >
+                        Unlock
+                      </button>
+                    ) : (
+                      "Not available"
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <br />
-          Last finalized block: {Number(lastFinalizedBlock)}. Withdrawal block needs to be higher or equal to it for the funds to be unlocked.
+          Last finalized block: {Number(lastFinalizedBlock)}. Withdrawal block
+          needs to be higher or equal to it for the funds to be unlocked.
         </>
       )}
-      {withdrawalRequests?.length === 0 && (
-        <>
-          No pending withdrawal requests.
-        </>
-      )}
+      {withdrawalRequests?.length === 0 && <>No pending withdrawal requests.</>}
     </div>
   );
 }

@@ -1,19 +1,25 @@
 import { Cell, Hash, HexNumber, HexString } from "@ckb-lumos/base";
 import { minimalCellCapacity } from "@ckb-lumos/helpers";
-import { core } from '@polyjuice-provider/godwoken';
-import {
-  WithdrawalLockArgs,
-} from "./base/types";
+import { core } from "@polyjuice-provider/godwoken";
+import { WithdrawalLockArgs } from "./base/types";
 import { Reader } from "ckb-js-toolkit";
-import { Address, Amount, AmountUnit, Cell as PwCell, HashType, OutPoint, Script, ScriptType, SnakeScript } from "@lay2/pw-core";
+import {
+  Address,
+  Amount,
+  AmountUnit,
+  Cell as PwCell,
+  OutPoint,
+  Script,
+  ScriptType,
+  SnakeScript,
+} from "@lay2/pw-core";
 import { CkbIndexer } from "./indexer-remote";
 import { NormalizeWithdrawalLockArgs } from "./base/normalizers";
 import { SerializeWithdrawalLockArgs } from "@polyjuice-provider/godwoken/schemas";
-import CONFIG from '../../../config';
 
 export interface WithdrawalRequest {
-	amount: bigint;
-	withdrawalBlockNumber: bigint;
+  amount: bigint;
+  withdrawalBlockNumber: bigint;
   cell: Cell;
 }
 
@@ -73,37 +79,38 @@ export function minimalWithdrawalCapacity(isSudt: boolean): HexNumber {
   return "0x" + capacity.toString(16);
 }
 
-export async function getRollupCellWithState(rollupTypeScript: SnakeScript) {
-  const indexer = new CkbIndexer(
-    CONFIG.testnet.ckbRpcUrl,
-    CONFIG.testnet.ckbIndexerUrl
-  );
+export async function getRollupCellWithState(
+  rollupTypeScript: SnakeScript,
+  ckbRpcUrl: string,
+  ckbIndexerUrl: string
+) {
+  const indexer = new CkbIndexer(ckbRpcUrl, ckbIndexerUrl);
 
   // * search rollup cell then get last_finalized_block_number from cell data (GlobalState)
   const rollupCells = await indexer.getCells({
     script: rollupTypeScript,
-    script_type: ScriptType.type
+    script_type: ScriptType.type,
   });
 
   let rollupCell: PwCell | undefined = undefined;
   for await (const cell of rollupCells) {
     const lock = Script.fromRPC(cell.cell_output.lock);
     if (!lock || !cell.out_point) {
-      throw new Error('Rollup cell has no lock script or out point.');
+      throw new Error("Rollup cell has no lock script or out point.");
     }
-    
+
     rollupCell = new PwCell(
-        new Amount(cell.cell_output.capacity, AmountUnit.shannon),
-        lock,
-        Script.fromRPC(cell.cell_output.type),
-        new OutPoint(cell.out_point.tx_hash, cell.out_point.index),
-        cell.data
-      );
+      new Amount(cell.cell_output.capacity, AmountUnit.shannon),
+      lock,
+      Script.fromRPC(cell.cell_output.type),
+      new OutPoint(cell.out_point.tx_hash, cell.out_point.index),
+      cell.data
+    );
     break;
   }
 
-  if (rollupCell === null || typeof(rollupCell) === 'undefined') {
-    throw new Error('Rollup cell not found.');
+  if (rollupCell === null || typeof rollupCell === "undefined") {
+    throw new Error("Rollup cell not found.");
   }
 
   const globalState = new core.GlobalState(new Reader(rollupCell.getHexData()));
@@ -114,9 +121,12 @@ export async function getRollupCellWithState(rollupTypeScript: SnakeScript) {
   return { rollupCell, lastFinalizedBlockNumber };
 }
 
- export async function fetchWithdrawalRequests(
+export async function fetchWithdrawalRequests(
   ckbAddress: Address,
-  rollupTypeHash: string
+  rollupTypeHash: string,
+  withdrawalLockScript: SnakeScript,
+  ckbRpcUrl: string,
+  ckbIndexerUrl: string
 ): Promise<WithdrawalRequest[]> {
   const lock_script = ckbAddress.toLockScript();
   const lock_script_hash = lock_script.toHash();
@@ -129,27 +139,24 @@ export async function getRollupCellWithState(rollupTypeScript: SnakeScript) {
   //   - owner secp256k1 blake2b160 lock hash
   //   - last_finalized_block_number
   //   - TODO: withdrawal_block_hash (to proof the block is on current rollup)
-  
-  const indexer = new CkbIndexer(
-    CONFIG.testnet.ckbRpcUrl,
-    CONFIG.testnet.ckbIndexerUrl
-  );
-  
+
+  const indexer = new CkbIndexer(ckbRpcUrl, ckbIndexerUrl);
+
   const withdrawalCollector = indexer.collector({
     lock: {
-        code_hash: CONFIG.testnet.godwoken.withdrawalLockScript.code_hash,
-        hash_type: CONFIG.testnet.godwoken.withdrawalLockScript.hash_type as HashType,
-        args: rollupTypeHash, // prefix search
+      code_hash: withdrawalLockScript.code_hash,
+      hash_type: withdrawalLockScript.hash_type,
+      args: rollupTypeHash, // prefix search
     },
     type: "empty",
     argsLen: "any",
-    fromBlock: '1000000'
+    fromBlock: "1000000",
   });
 
   const withdrawalCells: WithdrawalRequest[] = [];
   for await (const cell of withdrawalCollector.collect()) {
     const lock_args = cell.cell_output.lock.args;
-    const withdrawal_lock_args_data = '0x' + lock_args.slice(66);
+    const withdrawal_lock_args_data = "0x" + lock_args.slice(66);
     const withdrawal_lock_args = new core.WithdrawalLockArgs(
       new Reader(withdrawal_lock_args_data)
     );
@@ -167,9 +174,11 @@ export async function getRollupCellWithState(rollupTypeScript: SnakeScript) {
     withdrawalCells.push({
       cell,
       withdrawalBlockNumber,
-      amount: withdrawal_lock_args.getSellCapacity().toLittleEndianBigUint64()
+      amount: withdrawal_lock_args.getSellCapacity().toLittleEndianBigUint64(),
     });
   }
 
-  return withdrawalCells.sort((a, b) => Number(a.withdrawalBlockNumber - b.withdrawalBlockNumber));
-};
+  return withdrawalCells.sort((a, b) =>
+    Number(a.withdrawalBlockNumber - b.withdrawalBlockNumber)
+  );
+}
