@@ -33,7 +33,7 @@ const config =
 	mainnet:
 	{
 		ckbRpcUrl: '//rpc.ckb.tools',
-		ckbIndexerUrl: '//3.235.223.161:8116',
+		ckbIndexerUrl: '//indexer.ckb.tools',
 		ckbExplorerUrl: '//explorer.nervos.org/',
 
 		godwoken: {
