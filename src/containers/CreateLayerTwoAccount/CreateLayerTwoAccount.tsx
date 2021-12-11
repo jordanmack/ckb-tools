@@ -24,7 +24,7 @@ interface PwObject
 
 const MAINNET_CONFIG: IAddressTranslatorConfig = {
 	CKB_URL: Config.mainnet.ckbRpcUrl,
-	INDEXER_URL: Config.mainnet.ckbExplorerUrl,
+	INDEXER_URL: Config.mainnet.ckbIndexerUrl,
 	RPC_URL: Config.mainnet.godwoken.rpcUrl,
 	deposit_lock_script_type_hash: Config.mainnet.godwoken.depositLockScriptTypeHash,
 	eth_account_lock_script_type_hash: Config.mainnet.godwoken.ethAccountLockScriptTypeHash,
@@ -228,8 +228,8 @@ return <main className="create-l2-account">
 			Please connect Ethereum account. Check for "Connect account" modal in your wallet extension.	
 		</div>}
 		
-	{!isMainnet && Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
-	{!isMainnet && withdrawVisibile && pw && <><br/><br/><br/><WithdrawLayerTwo pw={pw} /></>}
+	{Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
+	{withdrawVisibile && pw && <><br/><br/><br/><WithdrawLayerTwo pw={pw} chainType={chainType} /></>}
 	</main>
 }
 
