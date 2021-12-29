@@ -1,4 +1,4 @@
-import PWCore, {Address, Amount, AmountUnit, Builder, Cell, CellDep, normalizers, OutPoint, RawTransaction, Reader, Script, SerializeWitnessArgs, Transaction, WitnessArgs} from "@lay2/pw-core";
+import PWCore, {Address, Amount, AmountUnit, Builder, Cell, CellDep, ChainID, normalizers, OutPoint, RawTransaction, Reader, Script, SerializeWitnessArgs, Transaction, WitnessArgs} from "@lay2/pw-core";
 import { SerializeUnlockWithdrawalViaFinalize  } from "@polyjuice-provider/godwoken/schemas";
 
 import BasicCollector from "../collectors/BasicCollector";
@@ -32,7 +32,10 @@ export default class GodwokenUnlockBuilder extends Builder
         public collector: BasicCollector,
         public fee: Amount,
         public withdrawalLockCellDep: CellDep,
-        public rollupCellDep: CellDep
+        public rollupCellDep: CellDep,
+        public portalWalletWitnessArgs: WitnessArgs = PWCore.chainId === ChainID.ckb
+            ? Builder.WITNESS_ARGS.RawSecp256k1
+            : Builder.WITNESS_ARGS.Secp256k1
     )
 	{
 		super();
@@ -128,7 +131,7 @@ export default class GodwokenUnlockBuilder extends Builder
             )
         ).serializeJson();
         
-		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [withdrawalWitnessArgsSerialized, Builder.WITNESS_ARGS.Secp256k1]);
+		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [withdrawalWitnessArgsSerialized, this.portalWalletWitnessArgs]);
 		this.fee = Builder.calcFee(tx);
 
 		// Throw error if the fee is too low.
