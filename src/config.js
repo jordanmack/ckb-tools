@@ -37,7 +37,7 @@ const config =
 		ckbExplorerUrl: '//explorer.nervos.org/',
 
 		godwoken: {
-			rpcUrl: '//mainnet.godwoken.io/rpc',
+			rpcUrl: 'https://mainnet.godwoken.io/rpc',
 			rollupTypeHash: '0x40d73f0d3c561fcaae330eabc030d8d96a9d0af36d0c5114883658a350cb9e3b',
 			rollupTypeScript: {
 				code_hash: '0xa9267ff5a16f38aa9382608eb9022883a78e6a40855107bb59f8406cce00e981',
