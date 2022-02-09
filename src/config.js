@@ -6,6 +6,7 @@ const config =
 		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
 		ckbExplorerUrl: '//explorer.nervos.org/aggron/',
 		faucetUrl: 'https://faucet.nervos.org/',
+		rc_lock_script_type_hash: '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
 
 		godwoken: {
 			rpcUrl: '//godwoken-testnet-web3-rpc.ckbapp.dev',
@@ -18,6 +19,7 @@ const config =
 			ethAccountLockScriptTypeHash: '0xdeec13a7b8e100579541384ccaf4b5223733e4a5483c3aec95ddc4c1d5ea5b22',
 			creatorAccountId: '0x3',
 			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
+			depositLockScriptTypeHash: '0x5a2506bb68d81a11dcadad4cb7eae62a17c43c619fe47ac8037bc8ce2dd90360',
 			withdrawalLockScript: {
 				code_hash: '0x170ef156e9f6132dbca6069dfd3e436f7d91c29d3ac7332c4b33e633b6a299b5',
 				args: '0x',
@@ -35,6 +37,7 @@ const config =
 		ckbRpcUrl: '//rpc.ckb.tools',
 		ckbIndexerUrl: '//indexer.ckb.tools',
 		ckbExplorerUrl: '//explorer.nervos.org/',
+		rc_lock_script_type_hash: '0x9f3aeaf2fc439549cbc870c653374943af96a0658bd6b51be8d8983183e6f52f',
 
 		godwoken: {
 			rpcUrl: 'https://mainnet.godwoken.io/rpc',
@@ -48,7 +51,6 @@ const config =
 			creatorAccountId: '0x3',
 			polyjuiceValidatorScriptCodeHash: '0x636b89329db092883883ab5256e435ccabeee07b52091a78be22179636affce8',
 			depositLockScriptTypeHash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
-			portalWalletLockHash: '0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc',
 			withdrawalLockScript: {
 				code_hash: '0xf1717ee388b181fcb14352055c00b7ea7cd7c27350ffd1a2dd231e059dde2fed',
 				args: '0x',
