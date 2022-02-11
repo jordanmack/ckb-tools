@@ -1,5 +1,4 @@
 import {useState, useEffect, useCallback} from 'react';
-import PWCore, {EthProvider, Provider} from '@lay2/pw-core';
 import {toast} from 'react-toastify';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -7,20 +6,12 @@ import { AddressTranslator, IAddressTranslatorConfig } from 'nervos-godwoken-int
 
 import './CreateLayerTwoAccount.scss';
 import Config from '../../config.js';
-import {ChainTypes, ChainTypeString} from '../../common/ts/Types';
+import {ChainTypes} from '../../common/ts/Types';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreateNervosAccountModal from './modals/CreateNervosAccountModal/index';
-import BasicCollector from '../../collectors/BasicCollector';
 import { ThemeProvider } from './styles/theme/index';
 import { NetworkEnum } from './AccountBox/AccountBox.types';
 import { WithdrawLayerTwo } from '../WithdrawLayerTwo/WithdrawLayerTwo';
-
-interface PwObject
-{
-	collector: BasicCollector,
-	pwCore: PWCore,
-	provider: Provider,
-}
 
 const MAINNET_CONFIG: IAddressTranslatorConfig = {
 	CKB_URL: Config.mainnet.ckbRpcUrl,
@@ -28,9 +19,20 @@ const MAINNET_CONFIG: IAddressTranslatorConfig = {
 	RPC_URL: Config.mainnet.godwoken.rpcUrl,
 	deposit_lock_script_type_hash: Config.mainnet.godwoken.depositLockScriptTypeHash,
 	eth_account_lock_script_type_hash: Config.mainnet.godwoken.ethAccountLockScriptTypeHash,
-	portal_wallet_lock_hash: Config.mainnet.godwoken.portalWalletLockHash,
 	rollup_type_hash: Config.mainnet.godwoken.rollupTypeHash,
-	rollup_type_script: Config.mainnet.godwoken.rollupTypeScript
+	rollup_type_script: Config.mainnet.godwoken.rollupTypeScript,
+	rc_lock_script_type_hash: Config.mainnet.rc_lock_script_type_hash
+};
+
+const TESTNET_CONFIG: IAddressTranslatorConfig = {
+	CKB_URL: Config.testnet.ckbRpcUrl,
+	INDEXER_URL: Config.testnet.ckbIndexerUrl,
+	RPC_URL: Config.testnet.godwoken.rpcUrl,
+	deposit_lock_script_type_hash: Config.testnet.godwoken.depositLockScriptTypeHash,
+	eth_account_lock_script_type_hash: Config.testnet.godwoken.ethAccountLockScriptTypeHash,
+	rollup_type_hash: Config.testnet.godwoken.rollupTypeHash,
+	rollup_type_script: Config.testnet.godwoken.rollupTypeScript,
+	rc_lock_script_type_hash: Config.testnet.rc_lock_script_type_hash
 };
 
 const TESTNET_MESSAGE = "First, please transfer at least 470 CKB to your account (copy your Layer 1 address into faucet and request funds) and then create a new account by pressing the CREATE ACCOUNT button.";
@@ -39,11 +41,12 @@ const MAINNET_MESSAGE = "First, please transfer at least 470 CKB to your account
 function Component()
 {
 	const [open, setOpen] = useState(false)
-	const [ckbAddress, setCkbAddress] = useState<string | null>(null);
-	const [pw, setPw] = useState<PwObject|null>(null);
-	const [pwLoading, setPwLoading] = useState(false);
+	const [ckbAddress, setCkbAddress] = useState<string | undefined>();
+	const [providerLoading, setProviderLoading] = useState(false);
 	const [fetchBalanceLoading, setFetchBalanceLoading] = useState(false);
 	const [createAccountLoading, setCreateAccountLoading] = useState(false);
+	const [addressTranslator, setAddressTranslator] = useState<AddressTranslator>();
+	const [connectedEthAddress, setConnectedEthAddress] = useState<string | undefined>();
 	
 	const [chainType, setChainType] = useState(ChainTypes.testnet);
 	const [layer2Balance, setLayer2Balance] = useState<number | null>(null);
@@ -51,20 +54,9 @@ function Component()
 	const [waitingForAccountCreation, setWaitingForAccountCreation] = useState(false);
 	const [withdrawVisibile, setWithdrawVisibility] = useState(false);
 
-	const loading = pwLoading || fetchBalanceLoading || createAccountLoading;
+	const loading = providerLoading || fetchBalanceLoading || createAccountLoading;
 	const isMainnet = chainType === ChainTypes.mainnet;
 
-	
-	async function initPwCore(chainType: ChainTypes)
-{
-	setPwLoading(true);
-	const provider = new EthProvider();
-	const collector = new BasicCollector(Config[ChainTypes[chainType] as ChainTypeString].ckbIndexerUrl);
-	const pwCore = await new PWCore(Config[ChainTypes[chainType] as ChainTypeString].ckbRpcUrl).init(provider, collector);
-	setPwLoading(false);
-
-	return {pwCore, provider, collector};
-}
 
 const fetchConnectedAccountBalance = useCallback(async function () {
 	const response = await fetch(isMainnet ? MAINNET_CONFIG.RPC_URL : Config.testnet.godwoken.rpcUrl, {
@@ -77,7 +69,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 			jsonrpc: '2.0',
 			id: 1,
 			method: 'eth_getBalance',
-			params: [ pw?.provider.address.addressString, 'latest']
+			params: [ connectedEthAddress, 'latest']
 		}),
 		mode: 'cors'
 	});
@@ -85,32 +77,50 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 	const json = await response.json();
 
 	return parseInt(json.result);
-}, [pw?.provider.address.addressString, isMainnet]);
+}, [connectedEthAddress, isMainnet]);
 
 	useEffect(()=>
 	{
+		async function initProvider()
+		{
+			setProviderLoading(true);
+		
+			let config = isMainnet ? MAINNET_CONFIG : TESTNET_CONFIG;
+			const translator = new AddressTranslator(config);
+			await translator.init(isMainnet ? 'mainnet' : 'testnet');
+		
+			await translator.connectWallet();
+		
+			setAddressTranslator(translator);
+			setConnectedEthAddress(translator.getConnectedWalletAddress());
+			setProviderLoading(false);
+		}
+
 		(async () => {
 			const provider = await detectEthereumProvider();
 
 			if (provider) {
-				const pwValues = await initPwCore(chainType);
-				
-				setPw(pwValues);
+				await initProvider();
 			} else {
 				alert('A MetaMask compatible browser extension was not detected.\nThis tool will not function without one installed.');
 			}
 		})();
-	}, [chainType, setPw]);
+	}, [isMainnet]);
 
 	useEffect(() => {
-		if (pw) {
-			const ckbAddress = pw.provider.address.toCKBAddress();
-			setCkbAddress(ckbAddress.toString());
+		if (!connectedEthAddress) {
+			setCkbAddress(undefined);
+			return;
 		}
-	}, [pw, pw?.provider.address.addressString]);
+
+		if (addressTranslator) {
+			const ckbAddress = addressTranslator.ethAddressToCkbAddress(connectedEthAddress);
+			setCkbAddress(ckbAddress);
+		}
+	}, [addressTranslator, connectedEthAddress]);
 
 	useEffect(() => {
-		if (!pw?.provider.address.addressString) {
+		if (!connectedEthAddress) {
 			return;
 		}
 
@@ -121,7 +131,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 			setFetchBalanceLoading(false);
 		})();
 		
-	}, [fetchConnectedAccountBalance, pw?.provider.address.addressString]);
+	}, [fetchConnectedAccountBalance, connectedEthAddress]);
 
 	useEffect(() => {
 		setWithdrawVisibility(false);
@@ -150,8 +160,8 @@ return <main className="create-l2-account">
 						</label>
 					</section>
 
-		{pw?.provider.address.addressString ? <>
-			<div>Connected ETH address: {pw.provider.address.addressString}</div>
+		{connectedEthAddress ? <>
+			<div>Connected ETH address: {connectedEthAddress}</div>
 			<br/>
 			{layer2Balance ? <>
 				<div>You already have a Nervos Layer 2 account with CKB.</div>
@@ -184,10 +194,12 @@ return <main className="create-l2-account">
 		}}
 		handleCreateNervosAccount={async () => {
 				try {
-					let config = isMainnet ? MAINNET_CONFIG : undefined;
-					const addressTranslator = new AddressTranslator(config);
+					if (!addressTranslator) {
+						toast.error(`Critical error. Adress translator is undefined.`);
+						return;
+					}
 
-					await addressTranslator.createLayer2Address(pw.provider.address.addressString);
+					await addressTranslator.createLayer2Address(connectedEthAddress);
 
 					setOpen(false);
 					setWaitingForAccountCreation(true);
@@ -229,7 +241,7 @@ return <main className="create-l2-account">
 		</div>}
 		
 	{Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
-	{withdrawVisibile && pw && <><br/><br/><br/><WithdrawLayerTwo pw={pw} chainType={chainType} /></>}
+	{withdrawVisibile && addressTranslator && connectedEthAddress && <><br/><br/><br/><WithdrawLayerTwo addressTranslator={addressTranslator} chainType={chainType} ethAddress={connectedEthAddress} /></>}
 	</main>
 }
 
