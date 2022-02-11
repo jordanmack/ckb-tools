@@ -1,50 +1,19 @@
-import { useState } from "react";
-import PWCore, {
-  Address,
-  AddressType,
-  Amount,
-  AmountUnit,
-  CellDep,
-  DefaultSigner,
-  DepType,
-  OutPoint,
-  Provider,
-  Reader,
-  SnakeScript,
-  transformers,
-} from "@lay2/pw-core";
-import { Godwoker, RequireResult } from "@polyjuice-provider/base";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 import "./WithdrawalLayerTwo.scss";
-import {
-  fetchWithdrawalRequests,
-  getRollupCellWithState,
-  minimalWithdrawalCapacity,
-  WithdrawalRequest,
-} from "./utils/withdrawal";
-import { generateWithdrawalRequest } from "./utils/transaction";
-import { Fee } from "./utils/base/types.js";
-import { NormalizeWithdrawalRequest } from "./utils/base/normalizers";
 import GLOBAL_CONFIG from "../../config";
-import BasicCollector from "../../collectors/BasicCollector";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
-import GodwokenUnlockBuilder from "../../builders/GodwokenUnlockBuilder";
 import { ChainTypes, ChainTypeString } from "../../common/ts/Types";
-import { SerializeWithdrawalRequest } from "@polyjuice-provider/godwoken/schemas";
-
-interface PwObject {
-  collector: BasicCollector;
-  pwCore: PWCore;
-  provider: Provider;
-}
+import { AddressTranslator, GodwokenWithdraw, WithdrawalRequest, Script, GwUnlockBuilderCellDep } from "nervos-godwoken-integration";
 
 interface WithdrawLayerTwoProps {
-  pw: PwObject;
+  addressTranslator: AddressTranslator;
   chainType: ChainTypes;
+  ethAddress: string;
 }
 
-export function WithdrawLayerTwo({ pw, chainType }: WithdrawLayerTwoProps) {
+export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: WithdrawLayerTwoProps) {
   const [withdrawalRequests, setWithdrawalRequests] = useState<
     WithdrawalRequest[] | null
   >(null);
@@ -53,162 +22,81 @@ export function WithdrawLayerTwo({ pw, chainType }: WithdrawLayerTwoProps) {
   const [createWithdrawRequestLoading, setCreateWithdrawRequestLoading] =
     useState(false);
   const [lastFinalizedBlock, setLastFinalizedBlock] = useState(BigInt(0));
+  const [godwokenWithdraw, setGodwokenWithdraw] = useState<GodwokenWithdraw>();
 
   const loading = fetchWithdrawRequestsLoading || createWithdrawRequestLoading;
-  const config = GLOBAL_CONFIG[ChainTypes[chainType] as ChainTypeString];
 
-  async function fetchWithdrawRequests(address: Address) {
+  const config = useMemo(() => {
+    return GLOBAL_CONFIG[ChainTypes[chainType] as ChainTypeString];
+  }, [chainType]);
+
+  useEffect(() => {
+    (async () => {
+      const gwWithdraw = new GodwokenWithdraw({
+        creatorAccountId: config.godwoken.creatorAccountId,
+        ethAccountLockScriptTypeHash: config.godwoken.ethAccountLockScriptTypeHash,
+        polyjuiceValidatorScriptCodeHash: config.godwoken.polyjuiceValidatorScriptCodeHash,
+        rollupTypeHash: config.godwoken.rollupTypeHash,
+        withdrawalLockScript: config.godwoken.withdrawalLockScript as Script,
+        withdrawalLockCellDep: config.godwoken.withdrawalLockCellDep as GwUnlockBuilderCellDep,
+        rollupTypeScript: config.godwoken.rollupTypeScript as Script
+      }, addressTranslator);
+      await gwWithdraw.init(chainType === ChainTypes.mainnet ? 'mainnet' : 'testnet');
+      setGodwokenWithdraw(gwWithdraw);
+    })();
+  }, [addressTranslator, config, chainType]);
+
+  async function fetchWithdrawRequests() {
+    if (!godwokenWithdraw) {
+      throw new Error('WithdrawLayerTwo component uninitialized.');
+    }
+
     setFetchWithdrawLoading(true);
 
-    setWithdrawalRequests(
-      await fetchWithdrawalRequests(
-        address,
-        config.godwoken.rollupTypeHash,
-        config.godwoken.withdrawalLockScript as SnakeScript,
-        config.ckbRpcUrl,
-        config.ckbIndexerUrl
-      )
-    );
-    const rollupData = await getRollupCellWithState(
-      config.godwoken.rollupTypeScript as SnakeScript,
-      config.ckbRpcUrl,
-      config.ckbIndexerUrl
-    );
+    const rollupData = await godwokenWithdraw.getRollupCellWithState();
 
     setLastFinalizedBlock(rollupData.lastFinalizedBlockNumber);
+
+    setWithdrawalRequests(
+      await godwokenWithdraw.fetchWithdrawalRequests(ethAddress)
+    );
     setFetchWithdrawLoading(false);
   }
 
-  async function withdraw(address: Address, amount: string) {
+  async function withdraw(amount: string) {
+    if (!godwokenWithdraw) {
+      throw new Error('WithdrawLayerTwo component uninitialized.');
+    }
+
     setCreateWithdrawRequestLoading(true);
 
-    const minimum = new Amount(
-      minimalWithdrawalCapacity(false),
-      AmountUnit.shannon
-    );
-    const desiredAmount = new Amount(amount, AmountUnit.ckb);
+    try {
+      await godwokenWithdraw.connectWallet();
+      await godwokenWithdraw.withdraw(ethAddress, amount, config.godwoken.rpcUrl);
 
-    if (desiredAmount.lt(minimum)) {
-      toast.error(
-        `Too low amount to withdraw. Minimum is: ${minimum.toString()} CKB.`
-      );
-      return;
-    }
-
-    const godwoker = new Godwoker(config.godwoken.rpcUrl);
-    await godwoker.init();
-
-    if (address.addressType !== AddressType.eth) {
+      toast.success("Withdrawal successfully requested!");
+    } catch (error: any) {
+      toast.error(error?.message || 'Unknown error.');
+    } finally {
       setCreateWithdrawRequestLoading(false);
-      throw new Error(
-        "Invalid AddressType. Please pass Ethereum-type address."
-      );
     }
-
-    const fromId = await godwoker.getAccountIdByEoaEthAddress(
-      address.addressString
-    );
-
-    const capacity =
-      "0x" +
-      (BigInt(400) * BigInt(Math.pow(10, 8))).toString(16).padStart(16, "0"); // used to be 1000 CKB
-    const ownerLockHash = address.toLockScript().toHash();
-    const fee: Fee = {
-      sudt_id: "0x1",
-      amount: "0x0",
-    };
-
-    const withdrawalConfig = {
-      rollupTypeHash: config.godwoken.rollupTypeHash,
-      polyjuice: {
-        ethAccountLockCodeHash: config.godwoken.ethAccountLockScriptTypeHash,
-        creatorAccountId: config.godwoken.creatorAccountId,
-        scriptCodeHash: config.godwoken.polyjuiceValidatorScriptCodeHash,
-      },
-    };
-
-    const request = await generateWithdrawalRequest(
-      godwoker,
-      address.addressString,
-      {
-        fromId,
-        capacity,
-        amount: "0x0",
-        ownerLockHash,
-        fee,
-      },
-      {
-        config: withdrawalConfig,
-      }
-    );
-
-    const normalizedRequest = NormalizeWithdrawalRequest(request);
-
-    const data = new Reader(
-      SerializeWithdrawalRequest(normalizedRequest)
-    ).serializeJson();
-
-    await godwoker.jsonRPC(
-      "gw_submit_withdrawal_request",
-      [data],
-      "",
-      RequireResult.canBeEmpty
-    );
-
-    setCreateWithdrawRequestLoading(false);
-    toast.success("Withdrawal successfully requested!");
   }
 
   async function unlock(
-    request: WithdrawalRequest,
-    ckbAddress: Address,
-    pw: PwObject
+    request: WithdrawalRequest
   ) {
-    const { rollupCell } = await getRollupCellWithState(
-      config.godwoken.rollupTypeScript as SnakeScript,
-      config.ckbRpcUrl,
-      config.ckbIndexerUrl
-    );
-
-    if (!rollupCell?.outPoint) {
-      throw new Error("Rollup cell missing.");
+    if (!godwokenWithdraw) {
+      throw new Error('WithdrawLayerTwo component uninitialized.');
     }
 
-    const collector = new BasicCollector(config.ckbIndexerUrl);
-    const fee = new Amount("10000", AmountUnit.shannon);
-    const withdrawalLockCellDep = new CellDep(
-      DepType.code,
-      new OutPoint(
-        config.godwoken.withdrawalLockCellDep.tx_hash,
-        config.godwoken.withdrawalLockCellDep.index
-      )
-    );
-    const rollupCellDep = new CellDep(DepType.code, rollupCell?.outPoint);
-    const builder = new GodwokenUnlockBuilder(
-      ckbAddress,
-      request,
-      collector,
-      fee,
-      withdrawalLockCellDep,
-      rollupCellDep
-    );
-
-    const transaction = await builder.build();
-    transaction.validate();
-
-    const signer = new DefaultSigner(pw.provider);
-    const signedTx = await signer.sign(transaction);
-
-    signedTx.witnesses[0] = signedTx.witnessArgs[0] as string;
-
     try {
-      const txId = await pw.pwCore.rpc.send_transaction(
-        transformers.TransformTransaction(signedTx),
-        "passthrough"
-      );
+      await godwokenWithdraw.connectWallet();
+      const txId = await godwokenWithdraw.unlock(request, ethAddress);
 
       toast.success(`Transaction submitted: ${txId} (Layer 1 transaction)`);
     } catch (error) {
+      console.log('err clause')
+      console.error(error);
       toast.error(`Unlock failed. Please try again.`);
     }
   }
@@ -223,12 +111,12 @@ export function WithdrawLayerTwo({ pw, chainType }: WithdrawLayerTwoProps) {
       <br />
       <br />
       <br />
-      <button onClick={() => withdraw(pw?.provider.address, "400")}>
+      <button onClick={() => withdraw("400")}>
         Create new withdrawal request of 400 CKB
       </button>
       <br />
       <br />
-      <button onClick={() => fetchWithdrawRequests(pw?.provider.address)}>
+      <button onClick={() => fetchWithdrawRequests()}>
         Fetch pending withdrawal requests
       </button>
       <br />
@@ -252,7 +140,7 @@ export function WithdrawLayerTwo({ pw, chainType }: WithdrawLayerTwoProps) {
                     {lastFinalizedBlock >= request.withdrawalBlockNumber ? (
                       <button
                         onClick={() =>
-                          unlock(request, pw?.provider.address, pw)
+                          unlock(request)
                         }
                       >
                         Unlock

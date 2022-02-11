@@ -241,7 +241,7 @@ return <main className="create-l2-account">
 		</div>}
 		
 	{Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
-	{/* {withdrawVisibile && pw && <><br/><br/><br/><WithdrawLayerTwo pw={pw} chainType={chainType} /></>} */}
+	{withdrawVisibile && addressTranslator && connectedEthAddress && <><br/><br/><br/><WithdrawLayerTwo addressTranslator={addressTranslator} chainType={chainType} ethAddress={connectedEthAddress} /></>}
 	</main>
 }
 

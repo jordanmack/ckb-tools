@@ -27,7 +27,8 @@ const config =
 			},
 			withdrawalLockCellDep: {
 				tx_hash: '0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828',
-				index: '0x0'
+				index: '0x0',
+				depType: 'code'
 			}
 		}
 	},
@@ -58,7 +59,8 @@ const config =
 			},
 			withdrawalLockCellDep: {
 				tx_hash: '0x3d727bd8bb1d87ba79638b63bfbf4c9a4feb9ac5ac5a0b356f3aaf4ccb4d3a1c',
-				index: '0x0'
+				index: '0x0',
+				depType: 'code'
 			}
 		}
 	},
