@@ -1,8 +1,44 @@
+@import '../../common/scss/variables.scss';
+@import 'include-media/dist/_include-media.scss';
+
 .withdrawal-table {
     border-collapse: collapse;
 
     td {
         padding: 10px;
         border: 1px solid white; 
+    }
+}
+
+.withdrawal-form {
+    input[type="text"]
+    {
+        font-family: $font-family-monospace;
+    }
+
+    section
+    {
+        margin: 0 0 $margin-thick 0;
+    }
+
+    fieldset
+    {
+        margin: 0 0 $margin-thick 0;
+
+        section
+        {
+            margin: 0;
+        }
+    }
+
+    .segmented-control
+    {
+        margin: 0;
+        transition-duration: 0.2s;
+
+        label
+        {
+            color: $color-nervos-green;
+        }
     }
 }

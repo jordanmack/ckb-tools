@@ -23,6 +23,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
     useState(false);
   const [lastFinalizedBlock, setLastFinalizedBlock] = useState(BigInt(0));
   const [godwokenWithdraw, setGodwokenWithdraw] = useState<GodwokenWithdraw>();
+  const [withdrawAmount, setWithdrawAmount] = useState<string>('400');
 
   const loading = fetchWithdrawRequestsLoading || createWithdrawRequestLoading;
 
@@ -63,7 +64,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
     setFetchWithdrawLoading(false);
   }
 
-  async function withdraw(amount: string) {
+  async function withdraw(amountInCkb: string) {
     if (!godwokenWithdraw) {
       throw new Error('WithdrawLayerTwo component uninitialized.');
     }
@@ -72,7 +73,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
 
     try {
       await godwokenWithdraw.connectWallet();
-      await godwokenWithdraw.withdraw(ethAddress, amount, config.godwoken.rpcUrl);
+      await godwokenWithdraw.withdraw(ethAddress, amountInCkb, config.godwoken.rpcUrl);
 
       toast.success("Withdrawal successfully requested!");
     } catch (error: any) {
@@ -95,7 +96,6 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
 
       toast.success(`Transaction submitted: ${txId} (Layer 1 transaction)`);
     } catch (error) {
-      console.log('err clause')
       console.error(error);
       toast.error(`Unlock failed. Please try again.`);
     }
@@ -111,12 +111,23 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
       <br />
       <br />
       <br />
-      <button onClick={() => withdraw("400")}>
-        Create new withdrawal request of 400 CKB
-      </button>
+      <form className="withdrawal-form" onSubmit={(e) => { e.preventDefault(); return false; }}>
+        <fieldset>
+          <legend>Withdraw amount in CKB integer</legend>
+          <section>
+            <input value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} />
+          </section>
+          <br/>
+          <section>
+          <button onClick={() => withdraw(withdrawAmount)} disabled={!godwokenWithdraw}>
+            Create new withdrawal request
+          </button>
+          </section>
+        </fieldset>
+      </form>
       <br />
       <br />
-      <button onClick={() => fetchWithdrawRequests()}>
+      <button onClick={() => fetchWithdrawRequests()} disabled={!godwokenWithdraw}>
         Fetch pending withdrawal requests
       </button>
       <br />
@@ -142,6 +153,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
                         onClick={() =>
                           unlock(request)
                         }
+                        disabled={!godwokenWithdraw}
                       >
                         Unlock
                       </button>
