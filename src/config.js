@@ -9,6 +9,39 @@ const config =
 		rc_lock_script_type_hash: '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
 
 		godwoken: {
+			rpcUrl: 'https://godwoken-testnet-web3-v1-rpc.ckbapp.dev',
+			rollupTypeHash: '0x4940246f168f4106429dc641add3381a44b5eef61e7754142f594e986671a575',
+			rollupTypeScript: {
+				code_hash: '0x0d3bfeaa292a59fcb58ed026e8f14e2167bd27f1765aa4b2af7d842b6123c6a9',
+				hash_type: 'type',
+				args: '0x8137c84a9089f92fee684ac840532ee1133b012a9d42b6b76b74fbdde6999230'
+			},
+			ethAccountLockScriptTypeHash: '0x10571f91073fdc3cdef4ddad96b4204dd30d6355f3dda9a6d7fc0fa0326408da',
+			creatorAccountId: '0x6',
+			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
+			depositLockScriptTypeHash: '0xcc2b4e14d7dfeb1e72f7708ac2d7f636ae222b003bac6bccfcf8f4dfebd9c714',
+			withdrawalLockScript: {
+				code_hash: '0x00000000000000000000000000000000000000000000000000545950455f4944',
+				args: '0xca4fec413acba90c3e50a0422d3780a8c5e8cce70ba0e6736d4b6559d79d639d',
+				hash_type: 'type'
+			},
+			withdrawalLockCellDep: {
+				tx_hash: '0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828',
+				index: '0x0',
+				depType: 'code'
+			}
+		}
+	},
+
+	testnet_v0:
+	{
+		ckbRpcUrl: '//rpc-testnet.ckb.tools',
+		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
+		ckbExplorerUrl: '//explorer.nervos.org/aggron/',
+		faucetUrl: 'https://faucet.nervos.org/',
+		rc_lock_script_type_hash: '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
+
+		godwoken: {
 			rpcUrl: '//godwoken-testnet-web3-rpc.ckbapp.dev',
 			rollupTypeHash: '0x4cc2e6526204ae6a2e8fcf12f7ad472f41a1606d5b9624beebd215d780809f6a',
 			rollupTypeScript: {
