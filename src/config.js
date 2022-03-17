@@ -26,7 +26,7 @@ const config =
 				hash_type: 'type'
 			},
 			withdrawalLockCellDep: {
-				tx_hash: '0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828',
+				tx_hash: '0x226311b5038e963296d94d31823c16bb572d9b5daa459d37d49834c67fcbe090',
 				index: '0x0',
 				depType: 'code'
 			}
