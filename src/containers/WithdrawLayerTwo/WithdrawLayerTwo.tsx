@@ -33,7 +33,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
 
   useEffect(() => {
     (async () => {
-      const gwWithdraw = new GodwokenWithdraw({
+      const gwWithdraw = new GodwokenWithdraw(config.godwoken.rpcUrl, {
         creatorAccountId: config.godwoken.creatorAccountId,
         ethAccountLockScriptTypeHash: config.godwoken.ethAccountLockScriptTypeHash,
         polyjuiceValidatorScriptCodeHash: config.godwoken.polyjuiceValidatorScriptCodeHash,
@@ -73,7 +73,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
 
     try {
       await godwokenWithdraw.connectWallet();
-      await godwokenWithdraw.withdraw(ethAddress, amountInCkb, config.godwoken.rpcUrl);
+      await godwokenWithdraw.withdraw(ethAddress, amountInCkb);
 
       toast.success("Withdrawal successfully requested!");
     } catch (error: any) {

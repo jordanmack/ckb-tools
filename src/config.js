@@ -21,8 +21,8 @@ const config =
 			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
 			depositLockScriptTypeHash: '0xcc2b4e14d7dfeb1e72f7708ac2d7f636ae222b003bac6bccfcf8f4dfebd9c714',
 			withdrawalLockScript: {
-				code_hash: '0x00000000000000000000000000000000000000000000000000545950455f4944',
-				args: '0xca4fec413acba90c3e50a0422d3780a8c5e8cce70ba0e6736d4b6559d79d639d',
+				code_hash: '0x318e8882bec0339fa20584f4791152e71d5b71c5dbd8bf988fd511373e142222',
+				args: '0x',
 				hash_type: 'type'
 			},
 			withdrawalLockCellDep: {
