@@ -240,7 +240,7 @@ return <main className="create-l2-account">
 			Please connect Ethereum account. Check for "Connect account" modal in your wallet extension.	
 		</div>}
 		
-	{Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button title="Withdrawal using ckb.tools UI is not implemented yet for new version of network (v1)." disabled={true} onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
+	{Boolean(layer2Balance) && <><br/><br/><br/><hr /><br/><br/><button onClick={() => setWithdrawVisibility(!withdrawVisibile)}>Toggle Withdraw view</button></>}
 	{withdrawVisibile && addressTranslator && connectedEthAddress && <><br/><br/><br/><WithdrawLayerTwo addressTranslator={addressTranslator} chainType={chainType} ethAddress={connectedEthAddress} /></>}
 	</main>
 }
