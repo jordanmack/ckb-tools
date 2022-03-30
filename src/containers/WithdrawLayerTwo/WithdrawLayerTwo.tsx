@@ -83,31 +83,13 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
     }
   }
 
-  async function unlock(
-    request: WithdrawalRequest
-  ) {
-    if (!godwokenWithdraw) {
-      throw new Error('WithdrawLayerTwo component uninitialized.');
-    }
-
-    try {
-      await godwokenWithdraw.connectWallet();
-      const txId = await godwokenWithdraw.unlock(request, ethAddress);
-
-      toast.success(`Transaction submitted: ${txId} (Layer 1 transaction)`);
-    } catch (error) {
-      console.error(error);
-      toast.error(`Unlock failed. Please try again.`);
-    }
-  }
-
   return (
     <div>
       {loading && <LoadingSpinner />}
-      Withdrawal from Godwoken is a 2 step process. First you have to initiate
+      Withdrawal from Godwoken is a 2 step process. First, you have to initiate
       withdrawal by creating withdrawal request. Then you need to wait about 5
-      days to "unlock" the funds and receive them on Layer 1. Fetch pending
-      requests to see if any of them is ready for unlocking.
+      days. Your funds will be automatically credited to your account. Fetch pending
+      requests to see if any of them is close to being unlocking to your Layer 1 Omnilock account.
       <br />
       <br />
       <br />
@@ -139,7 +121,6 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
               <tr>
                 <td>Amount (Shannon)</td>
                 <td>Withdrawal block</td>
-                <td>Action</td>
               </tr>
             </thead>
             <tbody>
@@ -147,20 +128,6 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
                 <tr key={index}>
                   <td>{request.amount.toString()}</td>
                   <td>{request.withdrawalBlockNumber.toString()}</td>
-                  <td>
-                    {lastFinalizedBlock >= request.withdrawalBlockNumber ? (
-                      <button
-                        onClick={() =>
-                          unlock(request)
-                        }
-                        disabled={!godwokenWithdraw}
-                      >
-                        Unlock
-                      </button>
-                    ) : (
-                      "Not available"
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>
