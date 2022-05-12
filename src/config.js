@@ -9,60 +9,18 @@ const config =
 		rc_lock_script_type_hash: '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
 
 		godwoken: {
-			rpcUrl: 'https://godwoken-testnet-web3-v1-rpc.ckbapp.dev',
-			rollupTypeHash: '0x4940246f168f4106429dc641add3381a44b5eef61e7754142f594e986671a575',
+			rpcUrl: 'https://godwoken-testnet-v1.ckbapp.dev',
+			rollupTypeHash: '0x702359ea7f073558921eb50d8c1c77e92f760c8f8656bde4995f26b8963e2dd8',
 			rollupTypeScript: {
-				code_hash: '0x0d3bfeaa292a59fcb58ed026e8f14e2167bd27f1765aa4b2af7d842b6123c6a9',
+				code_hash: '0x1e44736436b406f8e48a30dfbddcf044feb0c9eebfe63b0f81cb5bb727d84854',
 				hash_type: 'type',
-				args: '0x8137c84a9089f92fee684ac840532ee1133b012a9d42b6b76b74fbdde6999230'
+				args: '0x86c7429247beba7ddd6e4361bcdfc0510b0b644131e2afb7e486375249a01802'
 			},
-			ethAccountLockScriptTypeHash: '0x10571f91073fdc3cdef4ddad96b4204dd30d6355f3dda9a6d7fc0fa0326408da',
-			creatorAccountId: '0x6',
-			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
-			depositLockScriptTypeHash: '0xcc2b4e14d7dfeb1e72f7708ac2d7f636ae222b003bac6bccfcf8f4dfebd9c714',
-			withdrawalLockScript: {
-				code_hash: '0x318e8882bec0339fa20584f4791152e71d5b71c5dbd8bf988fd511373e142222',
-				args: '0x',
-				hash_type: 'type'
-			},
-			withdrawalLockCellDep: {
-				tx_hash: '0x226311b5038e963296d94d31823c16bb572d9b5daa459d37d49834c67fcbe090',
-				index: '0x0',
-				depType: 'code'
-			}
-		}
-	},
-
-	testnet_v0:
-	{
-		ckbRpcUrl: '//rpc-testnet.ckb.tools',
-		ckbIndexerUrl: '//indexer-testnet.ckb.tools',
-		ckbExplorerUrl: '//explorer.nervos.org/aggron/',
-		faucetUrl: 'https://faucet.nervos.org/',
-		rc_lock_script_type_hash: '0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e',
-
-		godwoken: {
-			rpcUrl: '//godwoken-testnet-web3-rpc.ckbapp.dev',
-			rollupTypeHash: '0x4cc2e6526204ae6a2e8fcf12f7ad472f41a1606d5b9624beebd215d780809f6a',
-			rollupTypeScript: {
-				code_hash: '0x5c365147bb6c40e817a2a53e0dec3661f7390cc77f0c02db138303177b12e9fb',
-				hash_type: 'type',
-				args: '0x213743d13048e9f36728c547ab736023a7426e15a3d7d1c82f43ec3b5f266df2'
-			},
-			ethAccountLockScriptTypeHash: '0xdeec13a7b8e100579541384ccaf4b5223733e4a5483c3aec95ddc4c1d5ea5b22',
-			creatorAccountId: '0x3',
-			polyjuiceValidatorScriptCodeHash: '0xbeb77e49c6506182ec0c02546aee9908aafc1561ec13beb488d14184c6cd1b79',
-			depositLockScriptTypeHash: '0x5a2506bb68d81a11dcadad4cb7eae62a17c43c619fe47ac8037bc8ce2dd90360',
-			withdrawalLockScript: {
-				code_hash: '0x170ef156e9f6132dbca6069dfd3e436f7d91c29d3ac7332c4b33e633b6a299b5',
-				args: '0x',
-				hash_type: 'type'
-			},
-			withdrawalLockCellDep: {
-				tx_hash: '0xb4b07dcd1571ac18683b515ada40e13b99bd0622197b6817047adc9f407f4828',
-				index: '0x0',
-				depType: 'code'
-			}
+			ethAccountLockScriptTypeHash: '0x07521d0aa8e66ef441ebc31204d86bb23fc83e9edc58c19dbb1b0ebe64336ec0',
+			creatorAccountId: '0x4',
+			polyjuiceValidatorScriptCodeHash: '0x1629b04b49ded9e5747481f985b11cba6cdd4ffc167971a585e96729455ca736',
+			depositLockScriptTypeHash: '0x50704b84ecb4c4b12b43c7acb260ddd69171c21b4c0ba15f3c469b7d143f6f18',
+			withdrawalLockScriptTypeHash: '0x06ae0706bb2d7997d66224741d3ec7c173dbb2854a6d2cf97088796b677269c6'
 		}
 	},
 
@@ -85,16 +43,7 @@ const config =
 			creatorAccountId: '0x3',
 			polyjuiceValidatorScriptCodeHash: '0x636b89329db092883883ab5256e435ccabeee07b52091a78be22179636affce8',
 			depositLockScriptTypeHash: '0xe24164e2204f998b088920405dece3dcfd5c1fbcb23aecfce4b3d3edf1488897',
-			withdrawalLockScript: {
-				code_hash: '0xf1717ee388b181fcb14352055c00b7ea7cd7c27350ffd1a2dd231e059dde2fed',
-				args: '0x',
-				hash_type: 'type'
-			},
-			withdrawalLockCellDep: {
-				tx_hash: '0x3d727bd8bb1d87ba79638b63bfbf4c9a4feb9ac5ac5a0b356f3aaf4ccb4d3a1c',
-				index: '0x0',
-				depType: 'code'
-			}
+			withdrawalLockScriptTypeHash: '0xf1717ee388b181fcb14352055c00b7ea7cd7c27350ffd1a2dd231e059dde2fed'
 		}
 	},
 

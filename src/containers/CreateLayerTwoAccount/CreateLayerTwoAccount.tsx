@@ -49,7 +49,7 @@ function Component()
 	const [connectedEthAddress, setConnectedEthAddress] = useState<string | undefined>();
 	
 	const [chainType, setChainType] = useState(ChainTypes.testnet);
-	const [layer2Balance, setLayer2Balance] = useState<number | null>(null);
+	const [layer2Balance, setLayer2Balance] = useState<BigInt | null>(null);
 	const [modalError, setModalError] = useState<string | null>(null);
 	const [waitingForAccountCreation, setWaitingForAccountCreation] = useState(false);
 	const [withdrawVisibile, setWithdrawVisibility] = useState(false);
@@ -76,7 +76,7 @@ const fetchConnectedAccountBalance = useCallback(async function () {
 
 	const json = await response.json();
 
-	return parseInt(json.result);
+	return BigInt(json.result);
 }, [connectedEthAddress, isMainnet]);
 
 	useEffect(()=>
@@ -153,7 +153,7 @@ return <main className="create-l2-account">
 							Nervos CKB Chain Type
 							<SegmentedControl name="chain-type" setValue={handleChainChanged} options={
 								[
-									{label: 'Testnet (v1, Omnilock)', value: ChainTypes.testnet, default: true},
+									{label: 'Testnet (v1.1, Omnilock)', value: ChainTypes.testnet, default: true},
 									{label: 'Mainnet', value: ChainTypes.mainnet, disabled: true},
 								]
 							} />
@@ -166,8 +166,8 @@ return <main className="create-l2-account">
 			{layer2Balance ? <>
 				<div>You already have a Nervos Layer 2 account with CKB.</div>
 			<br/>
-			<div>Your Layer 2 balance is: {layer2Balance ?? 0} Shannon.</div>
-			<div><i>1 Shannon is 1 / 10 ^ 8 of CKB.</i></div>
+			<div>Your Layer 2 balance is: {layer2Balance ? layer2Balance.toString() : 0} Wei.</div>
+			<div><i>1 Wei is 1 / 10¹⁸ of CKB.</i></div>
 			</> : <>
 			{layer2Balance === null ? <>
 				
@@ -208,7 +208,7 @@ return <main className="create-l2-account">
 					let maxTries = 300;
 					let currentTry = 1;
 
-					let balance: number | null = null;
+					let balance: BigInt | null = null;
 
 					while (!balance && currentTry <= maxTries) {
 						await new Promise(r => setTimeout(r, 1000));
@@ -216,8 +216,12 @@ return <main className="create-l2-account">
 						currentTry++;
 					}
 
-					setLayer2Balance(balance);
-					toast.success('You have successfully created and funded your Layer 2 account!');
+					if (balance) {
+						setLayer2Balance(balance);
+						toast.success('You have successfully created and funded your Layer 2 account!');
+					} else {
+						toast.error(`Couldn't create your account due to unknown reasons.`);
+					}
 				} catch (error: any) {
 					if (error?.message) {
 						setModalError(error.message || 'Unknown error');

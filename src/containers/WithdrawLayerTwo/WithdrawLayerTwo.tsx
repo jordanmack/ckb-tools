@@ -5,7 +5,7 @@ import "./WithdrawalLayerTwo.scss";
 import GLOBAL_CONFIG from "../../config";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { ChainTypes, ChainTypeString } from "../../common/ts/Types";
-import { AddressTranslator, GodwokenWithdraw, WithdrawalRequest, Script, GwUnlockBuilderCellDep } from "nervos-godwoken-integration";
+import { AddressTranslator, GodwokenWithdraw, WithdrawalRequest, Script } from "nervos-godwoken-integration";
 
 interface WithdrawLayerTwoProps {
   addressTranslator: AddressTranslator;
@@ -38,8 +38,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
         ethAccountLockScriptTypeHash: config.godwoken.ethAccountLockScriptTypeHash,
         polyjuiceValidatorScriptCodeHash: config.godwoken.polyjuiceValidatorScriptCodeHash,
         rollupTypeHash: config.godwoken.rollupTypeHash,
-        withdrawalLockScript: config.godwoken.withdrawalLockScript as Script,
-        withdrawalLockCellDep: config.godwoken.withdrawalLockCellDep as GwUnlockBuilderCellDep,
+        withdrawalLockScriptTypeHash: config.godwoken.withdrawalLockScriptTypeHash,
         rollupTypeScript: config.godwoken.rollupTypeScript as Script
       }, addressTranslator);
       await gwWithdraw.init(chainType === ChainTypes.mainnet ? 'mainnet' : 'testnet');
@@ -119,7 +118,7 @@ export function WithdrawLayerTwo({ addressTranslator, chainType, ethAddress }: W
           <table className="withdrawal-table">
             <thead>
               <tr>
-                <td>Amount (Shannon)</td>
+                <td>Amount (Shannon, 1 / 10⁸ CKB)</td>
                 <td>Withdrawal block</td>
               </tr>
             </thead>
