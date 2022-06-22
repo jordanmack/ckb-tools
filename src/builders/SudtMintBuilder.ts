@@ -1,4 +1,4 @@
-import PWCore, {Address, Amount, AmountUnit, Builder, Cell, ChainID, RawTransaction, SUDT, Transaction} from "@lay2/pw-core";
+import PWCore, {Address, Amount, AmountUnit, Builder, Cell, RawTransaction, SUDT, Transaction} from "@lay2/pw-core";
 import BasicCollector from "../collectors/BasicCollector";
 
 export default class SudtMintBuilder extends Builder
@@ -40,7 +40,7 @@ export default class SudtMintBuilder extends Builder
 		// Create the SUDT output cell.
 		const typeScript = sudt.toTypeScript();
 		const lockScript = destinationAddress.toLockScript();
-		const sudtCell = new Cell(new Amount("142", AmountUnit.ckb), lockScript, typeScript, undefined, amount.toUInt128LE());
+		const sudtCell = new Cell(new Amount("144", AmountUnit.ckb), lockScript, typeScript, undefined, amount.toUInt128LE());
 		outputCells.push(sudtCell);
 
 		// Calculate the required capacity. (SUDT cell + change cell minimum (61) + fee)
@@ -56,17 +56,18 @@ export default class SudtMintBuilder extends Builder
 		const changeCapacity = inputCapacity.sub(neededAmount.sub(new Amount("61", AmountUnit.ckb)));
 
 		// Add the change cell.
-		const changeLockScript = issuerAddress.toLockScript()
+		const changeLockScript = issuerAddress.toLockScript();
 		const changeCell = new Cell(changeCapacity, changeLockScript);
 		outputCells.push(changeCell);
 
 		// Add the required cell deps.
 		cellDeps.push(PWCore.config.defaultLock.cellDep);
-		cellDeps.push(PWCore.config.pwLock.cellDep);
+		// cellDeps.push(PWCore.config.pwLock.cellDep);
+		cellDeps.push(PWCore.config.omniLock!.cellDep);
 		cellDeps.push(PWCore.config.sudtType.cellDep);
 
-		// Generate a transaction and calculate the fee. (The second argument for witness args is needed for more accurate fee calculation.)
-		const witnessArgs = (PWCore.chainId === ChainID.ckb) ? Builder.WITNESS_ARGS.RawSecp256k1 : Builder.WITNESS_ARGS.Secp256k1;
+		// Generate a transaction and calculate the fee.
+		const witnessArgs = Builder.determineWitnessArgs(issuerAddress.toLockScript());
 		const tx = new Transaction(new RawTransaction(inputCells, outputCells, cellDeps), [witnessArgs]);
 		this.fee = Builder.calcFee(tx);
 

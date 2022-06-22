@@ -6,6 +6,7 @@ function Component()
 	const html =
 	(
 		<main className="bootstrap">
+			<h2>Bootstrap Tool</h2>
 			<img className="logo" src="./nervos-white.png" alt="Nervos Logo" />
 			<p>
 				It takes several hours for a new CKB node to download and synchronize with the rest of the network.
@@ -18,7 +19,7 @@ function Component()
 				Downloading and using this chain data can save many hours when bootstrapping a new instance of a CKB node or a CKB Indexer.
 			</p>
 			<p>
-				You can view the most recent snapshots <a href="https://cdn-ckb-tools.sfo3.digitaloceanspaces.com/snapshots/snapshots.html?prefix=snapshots/" target="_blank" rel="noreferrer">here</a> and older snapshots <a href="https://s3.amazonaws.com/cdn.ckb.tools/snapshots.html" target="_blank" rel="noreferrer">here</a>.
+				You can view the most recent snapshots <a href="https://cdn-ckb-tools.sfo3.digitaloceanspaces.com/snapshots/snapshots.html?prefix=snapshots/" target="_blank" rel="noreferrer">here</a>.
 			</p>
 			<p>
 				Basic Usage Instructions:

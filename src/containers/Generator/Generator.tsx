@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {AddressPrefix, privateKeyToPublicKey, privateKeyToAddress} from '@nervosnetwork/ckb-sdk-utils';
-import PWCore, {Address, AddressType, ChainID, HashType, Script} from '@lay2/pw-core';
+import PWCore, {Address, AddressType, ChainID, HashType, LockType, NervosAddressVersion, Script} from '@lay2/pw-core';
 // import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import ethWallet from 'ethereumjs-wallet';
 import arrayBufferToBuffer from 'arraybuffer-to-buffer';
@@ -26,6 +26,12 @@ enum GeneratorComponents
 	CkbHashType,
 	CkbArgs,
 	CkbLockHash,
+	OmniEthAddress,
+	OmniAddress,
+	OmniCodeHash,
+	OmniHashType,
+	OmniArgs,
+	OmniLockHash,
 	PwEthAddress,
 	PwAddress,
 	PwCodeHash,
@@ -148,34 +154,61 @@ function Component()
 			case GeneratorComponents.CkbLockHash:
 				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
 				lockScript = address.toLockScript();
-				lockScriptHash = lockScript.toHash() 
+				lockScriptHash = lockScript.toHash();
+				return lockScriptHash;
+			case GeneratorComponents.OmniEthAddress:
+				return ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString();
+			case GeneratorComponents.OmniAddress:
+				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
+				address = new Address(pwEthAddress, AddressType.eth);
+				return address.toCKBAddress();
+			case GeneratorComponents.OmniCodeHash:
+				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
+				address = new Address(pwEthAddress, AddressType.eth);
+				lockScript = address.toLockScript();
+				return lockScript.codeHash;
+			case GeneratorComponents.OmniHashType:
+				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
+				address = new Address(pwEthAddress, AddressType.eth);
+				lockScript = address.toLockScript();
+				return lockScript.hashType;
+			case GeneratorComponents.OmniArgs:
+				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
+				address = new Address(pwEthAddress, AddressType.eth);
+				lockScript = address.toLockScript();
+				return lockScript.args;
+			case GeneratorComponents.OmniLockHash:
+				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
+				address = new Address(pwEthAddress, AddressType.eth);
+				lockScript = address.toLockScript();
+				lockScriptHash = lockScript.toHash();
 				return lockScriptHash;
 			case GeneratorComponents.PwEthAddress:
 				return ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString();
 			case GeneratorComponents.PwAddress:
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
-				return address.toCKBAddress();
+				return address.toCKBAddress(NervosAddressVersion.ckb2021, LockType.pw);
 			case GeneratorComponents.PwCodeHash:
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
-				lockScript = address.toLockScript();
+				lockScript = address.toLockScript(LockType.pw);
 				return lockScript.codeHash;
 			case GeneratorComponents.PwHashType:
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
-				lockScript = address.toLockScript();
+				lockScript = address.toLockScript(LockType.pw);
 				return lockScript.hashType;
 			case GeneratorComponents.PwArgs:
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
-				lockScript = address.toLockScript();
+				lockScript = address.toLockScript(LockType.pw);
 				return lockScript.args;
 			case GeneratorComponents.PwLockHash:
 				pwEthAddress = ethWallet.fromPrivateKey(arrayBufferToBuffer(Utils.hexToArrayBuffer(privateKey))).getAddressString()
 				address = new Address(pwEthAddress, AddressType.eth);
-				lockScript = address.toLockScript();
-				lockScriptHash = lockScript.toHash() 
+				lockScript = address.toLockScript(LockType.pw);
+				lockScriptHash = lockScript.toHash();
 				return lockScriptHash;
 			case GeneratorComponents.AcpAddress:
 				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
@@ -202,7 +235,7 @@ function Component()
 				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
-				lockScriptHash = lockScript.toHash() 
+				lockScriptHash = lockScript.toHash();
 				return lockScriptHash;
 			default:
 				throw new Error('Invalid address component specified.');
@@ -301,6 +334,65 @@ function Component()
 								<input id="ckb-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.CkbLockHash)} />
 								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#ckb-lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
 								<button className="copy-button" data-clipboard-target="#ckb-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+				</fieldset>
+				<fieldset>
+					<legend>Omni Lock (Ethereum) - Testnet</legend>
+					<section>
+						<label title='An Ethereum address derived from the public key.'>
+							Ethereum Address
+							<div className="copy-container">
+								<input id="omni-eth-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniEthAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-eth-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-eth-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+					<section>
+						<label title='A Nervos CKB address starts with either "ckb" or "ckt".'>
+							Nervos CKB Address
+							<div className="copy-container">
+								<input id="omni-ckb-address" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniAddress)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-ckb-address" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-ckb-address" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+					<section>
+						<label title="A script code hash indicates the cell dep required for execution.">
+							Lock Script Code Hash
+							<div className="copy-container">
+								<input id="omni-code-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniCodeHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-code-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-code-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+						<label title="A script hash type indicates how the code hash should be matched against a cell dep.">
+							Lock Script Hash Type
+							<div className="copy-container">
+								<input id="omni-hash-type" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniHashType)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-hash-type" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-hash-type" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+						<label title="The script args are passed to the script code during execution.">
+							Lock Script Args
+							<div className="copy-container">
+								<input id="omni-args" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniArgs)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-args" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-args" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
+							</div>
+						</label>
+					</section>
+					<section>
+						<label title="A script hash is a 256-bit Blake2b hash of the script structure once it has been serialized in the Molecule format.">
+							Lock Script Hash
+							<div className="copy-container">
+								<input id="omni-lock-hash" type="text" readOnly={true} value={getAddressComponent(GeneratorComponents.OmniLockHash)} />
+								<button className={"qrcode-button" + ((valid)?' valid':'')} data-target="#omni-lock-hash" onClick={renderQrCode} disabled={!valid}><i className="fas fa-qrcode"></i></button>
+								<button className="copy-button" data-clipboard-target="#omni-lock-hash" onClick={(e)=>e.preventDefault()} disabled={!valid}><i className="far fa-copy"></i></button>
 							</div>
 						</label>
 					</section>

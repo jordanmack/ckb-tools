@@ -1,6 +1,8 @@
+dist: focal
 language: node_js
 node_js:
   - lts/*
+install: true
 
 before_script:
   - npm i --force

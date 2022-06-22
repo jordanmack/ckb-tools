@@ -34,8 +34,11 @@ enum AddressFlags
 	DefaultLock,
 	MultiSigLock,
 	PwLock,
+	OmniLock,
 	Mainnet,
 	Testnet,
+	Ckb2021,
+	Pre2021,
 }
 
 async function initPwCore(chain: ChainTypes)
@@ -186,12 +189,15 @@ function Component()
 		const lockScript = inputAddress!.toLockScript();
 		lockScript.args = '0x'; // Clear args so it can match against the chain specs which never include args.
 		const inputAddressPrefix = inputAddress!.toCKBAddress().substr(0, 3);
+		const addressDetails = inputAddress!.describe();
 
+		// The code below is manipulating and filtering the chainspecs so it can be checked against easier.
 		const chainSpecs = _.flatMap(CHAIN_SPECS, (n)=>[n]);
 		const acpLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'acpLockList')).map((o)=>o.acpLockList));
 		const defaultLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'defaultLock.script')).map((o)=>o.defaultLock.script));
 		const multiSigLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'multiSigLock.script')).map((o)=>o.multiSigLock.script));
 		const pwLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'pwLock.script')).map((o)=>o.pwLock.script));
+		const omniLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'omniLock.script')).map((o: any)=>o.omniLock.script)); // "o: any" used to ignore erroneous error on missing o.omniLock.
 
 		if(flag === AddressFlags.Acp)
 			return !!acpLockList.find((n)=>n.sameWith(lockScript));
@@ -201,10 +207,16 @@ function Component()
 			return !!multiSigLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.PwLock)
 			return !!pwLockList.find((n)=>n.sameWith(lockScript));
+		if(flag === AddressFlags.OmniLock)
+			return !!omniLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.Mainnet)
 			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckb' : ChainTypes[chainType]==='mainnet';
-			if(flag === AddressFlags.Testnet)
+		if(flag === AddressFlags.Testnet)
 			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckt' : ChainTypes[chainType]==='testnet';
+		if(flag === AddressFlags.Ckb2021)
+			return addressDetails.addressVersion==='ckb2021';
+		if(flag === AddressFlags.Pre2021)
+			return addressDetails.addressVersion==='pre2021';
 		else
 			throw new Error('Invalid address flag specified.');
 	}
@@ -324,8 +336,19 @@ function Component()
 						<label title="The Multi-Sig lock is also known as the SECP256k1-Blake160-MultiSig lock.">
 							<span className="label">Multi-Sig Lock</span> <Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} />
 						</label>
-						<label title="The PW-Lock is used for compatibility with wallets from other chains, such as MetaMask.">
+						<label title="PW-Lock is used for compatibility with wallets from other chains, such as MetaMask. Usage of PW-Lock is deprecated.">
 							<span className="label">PW-Lock</span> <Flag checked={getAddressFlag(AddressFlags.PwLock)} />
+						</label>
+						<label title="Omni Lock is used for compatibility with wallets from other chains, such as MetaMask. Omni Lock is the replacement for PW-Lock.">
+							<span className="label">Omni Lock</span> <Flag checked={getAddressFlag(AddressFlags.OmniLock)} />
+						</label>
+					</fieldset>
+					<fieldset>
+						<label title='CKB2021 addresses use the most recent encoding.'>
+							<span className="label">CKB2021</span> <Flag checked={getAddressFlag(AddressFlags.Ckb2021)} />
+						</label>
+						<label title='Pre-2021 addresses use a deprecated address format.'>
+							<span className="label">Pre-2021</span> <Flag checked={getAddressFlag(AddressFlags.Pre2021)} />
 						</label>
 					</fieldset>
 				</section>
