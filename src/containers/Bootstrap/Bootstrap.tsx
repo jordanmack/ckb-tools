@@ -15,7 +15,7 @@ function Component()
 			</p>
 			<p>
 				However, this same level of security may not be required for a Testnet node since we are not dealing with real funds.
-				For convinience purposes, we provide recent snapshots of the Testnet chain data for the <a href="https://github.com/nervosnetwork/ckb/releases" target="_blank" rel="noreferrer">CKB Node</a>, <a href="https://github.com/nervosnetwork/ckb-indexer/releases" target="_blank" rel="noreferrer">CKB Indexer</a>, and <a href="https://github.com/nervosnetwork/ckb-cli/releases" target="_blank" rel="noreferrer">CKB-CLI</a>.
+				For convinience purposes, we provide recent snapshots of the Testnet chain data for the <a href="https://github.com/nervosnetwork/ckb/releases" target="_blank" rel="noreferrer">CKB Node</a>, and <a href="https://github.com/nervosnetwork/ckb-indexer/releases" target="_blank" rel="noreferrer">CKB Indexer</a>.
 				Downloading and using this chain data can save many hours when bootstrapping a new instance of a CKB node or a CKB Indexer.
 			</p>
 			<p>
@@ -39,8 +39,6 @@ function Component()
 			<ul>
 				<li>CKB Node: &lt;app_folder&gt;/data/db</li>
 				<li>CKB Indexer: indexer_data (path specified during setup)</li>
-				<li>CKB-CLI (Linux/MacOS): ~/.ckb-cli/index-v1/0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606</li>
-				<li>CKB-CLI (Win 10): C:\&lt;USERNAME&gt;\.ckb-cli\index-v1\0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606</li>
 				<li>Neuron Wallet (Win 10): C:\Users\&lt;username&gt;\AppData\Roaming\Neuron\indexer_data\<wbr />0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606</li>
 			</ul>
 		</main>
