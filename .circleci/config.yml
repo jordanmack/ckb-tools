@@ -1,0 +1,18 @@
+version: '2.1'
+orbs:
+  node: circleci/node@5.1.0
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '13.14'
+    steps:
+      - checkout
+      - node/install-packages:
+          override-ci-command: npm ci --force
+      - run: rm -f node_modules/hookrouter/dist/index.d.ts
+      - run: npm run build
+workflows:
+  nodejs_build:
+    jobs:
+      - build
