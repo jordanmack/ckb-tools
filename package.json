@@ -1,6 +1,6 @@
 {
   "name": "ckb-tools",
-  "version": "0.8.20",
+  "version": "0.8.21",
   "private": true,
   "dependencies": {
     "@lay2/pw-core": "npm:@jm9k/pw-core@^0.4.1-alpha.1",
@@ -35,7 +35,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-legacy": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
+    "build-legacy": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "bump": "npm --no-git-tag-version version patch"

@@ -8,7 +8,7 @@
 ![Uptime Robot ratio (30 days)](https://img.shields.io/uptimerobot/ratio/m788404415-839b32111e1dc755c52c3e33)
 ![GitHub Repo stars](https://img.shields.io/github/stars/jordanmack/ckb-tools?style=social)
 
-[CKB.tools](https://ckb.tools/) is a online collection of free development tools created for use on Nervos Network.
+[CKB.tools](https://ckb.tools/) is an online collection of free development tools created for use on Nervos Network.
 
 ## Developing
 
@@ -39,13 +39,25 @@ Edit the `src/config.js` file as needed. (No changes are required to compile and
 ### Start the Development Server
 
 ```sh
-npm start
+npm run start
+```
+
+If you receive an error similar to `error:0308010C:digital envelope routines::unsupported`, then try the following instead.
+
+```sh
+npm run start-legacy
 ```
 
 ### Building
 
 ```sh
 npm run build
+```
+
+If you receive an error similar to `error:0308010C:digital envelope routines::unsupported`, then try the following instead.
+
+```sh
+npm run build-legacy
 ```
 
 ### Deploying
