@@ -36,6 +36,12 @@ rm -f node_modules/hookrouter/dist/index.d.ts
 
 Edit the `src/config.js` file as needed. (No changes are required to compile and run.)
 
+Depending on your Node.js version and OpenSSL version, you may need to export the following environmental variable:
+
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+
 ### Start the Development Server
 
 ```sh

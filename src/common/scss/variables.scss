@@ -7,12 +7,12 @@ $font-family-monospace: "Courier New", "Lucida Console";
 $font-size-default: 14px;
 $margin-default: 10px;
 $margin-button: 4px;
-$margin-thick: $margin-default * 2;
-$margin-thin: $margin-default / 2;
+$margin-thick: calc($margin-default * 2);
+$margin-thin: calc($margin-default / 2);
 $padding-default: 10px;
 $padding-cell: 2px;
-$padding-thick: $padding-default * 2;
-$padding-thin: $padding-default / 2;
+$padding-thick: calc($padding-default * 2);
+$padding-thin: calc($padding-default / 2);
 $padding-input: 8px;
 
 // Base Colors
