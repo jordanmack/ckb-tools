@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {AddressPrefix, privateKeyToPublicKey, privateKeyToAddress} from '@nervosnetwork/ckb-sdk-utils';
 import PWCore, {Address, AddressType, ChainID, HashType, LockType, NervosAddressVersion, Script} from '@lay2/pw-core';
-// import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
+import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import ethWallet from 'ethereumjs-wallet';
 import arrayBufferToBuffer from 'arraybuffer-to-buffer';
 import * as Crypto from 'crypto';
@@ -90,8 +90,19 @@ function renderQrCode(e?: React.SyntheticEvent<HTMLButtonElement>)
 function Component()
 {
 	const [valid, setValid] = useState(false);
+	const [chainType, setChainType] = useState(ChainTypes.testnet);
 	const [privateKey, setPrivateKey] = useState<string|null>(null);
 	const privateKeyRef = useRef<HTMLInputElement>(null);
+
+	const handleChainChanged = (value: ChainTypes) =>
+	{
+		if(value !== chainType)
+		{
+			setChainType(value);
+			initPwCore(value);
+			// handlePrivateKeyChange(); // This is now called in useEffect().
+		}
+	};
 
 	const handleGenerateClicked = (e?: React.SyntheticEvent) =>
 	{
@@ -128,6 +139,7 @@ function Component()
 		if(!valid || !privateKey)
 			return '';
 
+		const addressPrefix = (chainType === ChainTypes.mainnet) ? AddressPrefix.Mainnet : AddressPrefix.Testnet;
 		let address, lockScript, lockScriptHash, pwEthAddress;
 
 		switch(component)
@@ -137,22 +149,22 @@ function Component()
 			case GeneratorComponents.PublicKey:
 				return privateKeyToPublicKey(privateKey);
 			case GeneratorComponents.CkbAddress:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				return address.toCKBAddress();
 			case GeneratorComponents.CkbCodeHash:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				return lockScript.codeHash;
 			case GeneratorComponents.CkbHashType:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				return lockScript.hashType;
 			case GeneratorComponents.CkbArgs:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				return lockScript.args;
 			case GeneratorComponents.CkbLockHash:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScriptHash = lockScript.toHash();
 				return lockScriptHash;
@@ -211,28 +223,28 @@ function Component()
 				lockScriptHash = lockScript.toHash();
 				return lockScriptHash;
 			case GeneratorComponents.AcpAddress:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				address = lockScript.toAddress();
 				return address.toCKBAddress();
 			case GeneratorComponents.AcpCodeHash:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				return lockScript.codeHash;
 			case GeneratorComponents.AcpHashType:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				return lockScript.hashType;
 			case GeneratorComponents.AcpArgs:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				return lockScript.args;
 			case GeneratorComponents.AcpLockHash:
-				address = new Address(privateKeyToAddress(privateKey, {prefix: AddressPrefix.Testnet}), AddressType.ckb);
+				address = new Address(privateKeyToAddress(privateKey, {prefix: addressPrefix}), AddressType.ckb);
 				lockScript = address.toLockScript();
 				lockScript = new Script('0x3419a1c09eb2567f6552ee7a8ecffd64155cffe0f1796e6e61ec088d740c1356', lockScript.args, HashType.type);
 				lockScriptHash = lockScript.toHash();
@@ -243,7 +255,7 @@ function Component()
 	}
 
 	/* eslint-disable react-hooks/exhaustive-deps */
-	useEffect(()=>{initPwCore(ChainTypes.testnet)}, [true]); // Init PwCore.
+	useEffect(()=>{initPwCore(chainType);}, [true]); // Init PwCore.
 	useEffect(()=>{handlePrivateKeyChange();}, [true]); // Trigger a private key change when the chain type is updated to reinitialize all values.
 	useEffect(()=>{privateKeyRef.current?.focus();}, [true]); // Focus the input field on load, and when the input address type is changed.
 	useEffect(()=>{new ClipboardJS('.copy-button');Utils.addCopyButtonTooltips('copy-button');}, [valid]); // Initialize the clipboard buttons.
@@ -264,6 +276,17 @@ function Component()
 				This tool is designed for testing purposes only! Do not use this tool to generate addresses to secure real funds and assets!
 			</p>
 			<form id="address-form" onSubmit={()=>false}>
+				<section>
+					<label title='Chain types can be either Mainnet or Testnet.'>
+						Nervos CKB Chain Type
+						<SegmentedControl name="chain-type" setValue={handleChainChanged} options={
+							[
+								{label: 'Mainnet', value: ChainTypes.mainnet},
+								{label: 'Testnet', value: ChainTypes.testnet, default: true},
+							]
+						} />
+					</label>
+				</section>
 				{/* <section> */}
 					{/* <button className="generate-button" onClick={handleGenerateClicked} title="Generate a new random private key.">Generate Private Key</button> */}
 				{/* </section> */}
