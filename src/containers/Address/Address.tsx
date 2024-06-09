@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import PWCore, {Address, AddressType, ChainID, CHAIN_SPECS} from '@lay2/pw-core';
+import PWCore, {Address, AddressType, ChainID, CHAIN_SPECS, HashType, Script} from '@lay2/pw-core';
 import {SegmentedControlWithoutStyles as SegmentedControl} from 'segmented-control';
 import * as _ from 'lodash';
 import ClipboardJS from 'clipboard';
@@ -12,7 +12,9 @@ import NullProvider from '../../providers/NullProvider';
 import QrCode from '../../components/QrCode/QrCode';
 import Utils from '../../common/ts/Utils';
 import './Address.scss';
+// import { Hash } from 'crypto';
 
+// TODO: Include both CKB2019 and CKB2021 addresses in the KNOWN_ADDRESSES list.
 const KNOWN_ADDRESSES: {[key: string]: any} =
 {
 	'ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37': <>Note: This address is used for genesis issued cell #1 on a CKB dev chain. More information can be found <a href="https://docs.nervos.org/docs/basics/guides/devchain#adding-the-genesis-issued-cells" target="_blank" rel="noreferrer">here.</a></>,
@@ -32,13 +34,14 @@ enum AddressFlags
 {
 	Acp,
 	DefaultLock,
+	JoyIdLock,
 	MultiSigLock,
 	PwLock,
 	OmniLock,
 	Mainnet,
 	Testnet,
 	Ckb2021,
-	Pre2021,
+	Ckb2019,
 }
 
 async function initPwCore(chain: ChainTypes)
@@ -199,10 +202,17 @@ function Component()
 		const pwLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'pwLock.script')).map((o)=>o.pwLock.script));
 		const omniLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'omniLock.script')).map((o: any)=>o.omniLock.script)); // "o: any" used to ignore erroneous error on missing o.omniLock.
 
+		// TODO: Add JoyId lock list to the chain specs of PW-Core.
+		const joyIdLockMainnet = new Script('0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323', '0x', HashType.type);
+		const joyIdLockTestnet = new Script('0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac', '0x', HashType.type);
+		const joyideLockList = [joyIdLockMainnet, joyIdLockTestnet];
+
 		if(flag === AddressFlags.Acp)
 			return !!acpLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.DefaultLock)
 			return !!defaultLockList.find((n)=>n.sameWith(lockScript));
+		if(flag === AddressFlags.JoyIdLock)
+			return !!joyideLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.MultiSigLock)
 			return !!multiSigLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.PwLock)
@@ -215,7 +225,7 @@ function Component()
 			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckt' : ChainTypes[chainType]==='testnet';
 		if(flag === AddressFlags.Ckb2021)
 			return addressDetails.addressVersion==='ckb2021';
-		if(flag === AddressFlags.Pre2021)
+		if(flag === AddressFlags.Ckb2019)
 			return addressDetails.addressVersion==='pre2021';
 		else
 			throw new Error('Invalid address flag specified.');
@@ -333,6 +343,9 @@ function Component()
 						<label title="The Default lock is also known as the SECP256k1-Blake160-Sighash lock.">
 							<Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /> <span className="label">Default Lock</span>
 						</label>
+						<label title="The JoyId lock is used by the Joy wallet.">
+							<Flag checked={getAddressFlag(AddressFlags.JoyIdLock)} /> <span className="label">JoyId Lock</span>
+						</label>
 						<label title="The Multi-Sig lock is also known as the SECP256k1-Blake160-MultiSig lock.">
 							<Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /> <span className="label">Multi-Sig Lock</span>
 						</label>
@@ -345,7 +358,7 @@ function Component()
 					</fieldset>
 					<fieldset>
 						<label title='CKB2019 addresses use a deprecated address format.'>
-							<Flag checked={getAddressFlag(AddressFlags.Pre2021)} /> <span className="label">CKB2019</span>
+							<Flag checked={getAddressFlag(AddressFlags.Ckb2019)} /> <span className="label">CKB2019</span>
 						</label>
 						<label title='CKB2021 addresses use the most recent encoding.'>
 							<Flag checked={getAddressFlag(AddressFlags.Ckb2021)} /> <span className="label">CKB2021</span>
