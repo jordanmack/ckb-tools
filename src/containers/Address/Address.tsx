@@ -343,7 +343,7 @@ function Component()
 						<label title="The Default lock is also known as the SECP256k1-Blake160-Sighash lock.">
 							<Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /> <span className="label">Default Lock</span>
 						</label>
-						<label title="The JoyId lock is used by the Joy wallet.">
+						<label title="The JoyId lock is used by the JoyID wallet.">
 							<Flag checked={getAddressFlag(AddressFlags.JoyIdLock)} /> <span className="label">JoyId Lock</span>
 						</label>
 						<label title="The Multi-Sig lock is also known as the SECP256k1-Blake160-MultiSig lock.">
