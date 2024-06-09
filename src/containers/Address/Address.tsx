@@ -320,35 +320,35 @@ function Component()
 				<section className="flags">
 					<fieldset>
 						<label title='A Mainnet address always starts with "ckb".'>
-							<span className="label">Mainnet</span> <Flag checked={getAddressFlag(AddressFlags.Mainnet)} />
+							<Flag checked={getAddressFlag(AddressFlags.Mainnet)} /> <span className="label">Mainnet</span>
 						</label>
 						<label title='A Testnet address always starts with "ckt".'>
-							<span className="label">Testnet</span> <Flag checked={getAddressFlag(AddressFlags.Testnet)} />
+							<Flag checked={getAddressFlag(AddressFlags.Testnet)} /> <span className="label">Testnet</span>
 						</label>
 					</fieldset>
 					<fieldset>
 						<label title="An Anyone Can Pay (ACP) lock allows a user to receive funds without creating a new cell.">
-							<span className="label">ACP</span> <Flag checked={getAddressFlag(AddressFlags.Acp)} />
+							<Flag checked={getAddressFlag(AddressFlags.Acp)} /> <span className="label">ACP</span>
 						</label>
 						<label title="The Default lock is also known as the SECP256k1-Blake160-Sighash lock.">
-							<span className="label">Default Lock</span> <Flag checked={getAddressFlag(AddressFlags.DefaultLock)} />
+							<Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /> <span className="label">Default Lock</span>
 						</label>
 						<label title="The Multi-Sig lock is also known as the SECP256k1-Blake160-MultiSig lock.">
-							<span className="label">Multi-Sig Lock</span> <Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} />
+							<Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /> <span className="label">Multi-Sig Lock</span>
 						</label>
 						<label title="PW-Lock is used for compatibility with wallets from other chains, such as MetaMask. Usage of PW-Lock is deprecated.">
-							<span className="label">PW-Lock</span> <Flag checked={getAddressFlag(AddressFlags.PwLock)} />
+							<Flag checked={getAddressFlag(AddressFlags.PwLock)} /> <span className="label">PW-Lock</span>
 						</label>
 						<label title="Omni Lock is used for compatibility with wallets from other chains, such as MetaMask. Omni Lock is the replacement for PW-Lock.">
-							<span className="label">Omni Lock</span> <Flag checked={getAddressFlag(AddressFlags.OmniLock)} />
+							<Flag checked={getAddressFlag(AddressFlags.OmniLock)} /> <span className="label">Omni Lock</span>
 						</label>
 					</fieldset>
 					<fieldset>
-						<label title='CKB2021 addresses use the most recent encoding.'>
-							<span className="label">CKB2021</span> <Flag checked={getAddressFlag(AddressFlags.Ckb2021)} />
+						<label title='CKB2019 addresses use a deprecated address format.'>
+							<Flag checked={getAddressFlag(AddressFlags.Pre2021)} /> <span className="label">CKB2019</span>
 						</label>
-						<label title='Pre-2021 addresses use a deprecated address format.'>
-							<span className="label">Pre-2021</span> <Flag checked={getAddressFlag(AddressFlags.Pre2021)} />
+						<label title='CKB2021 addresses use the most recent encoding.'>
+							<Flag checked={getAddressFlag(AddressFlags.Ckb2021)} /> <span className="label">CKB2021</span>
 						</label>
 					</fieldset>
 				</section>
