@@ -38,6 +38,7 @@ enum AddressFlags
 	MultiSigLock,
 	PwLock,
 	OmniLock,
+	RgbPpLock,
 	Mainnet,
 	Testnet,
 	Ckb2021,
@@ -202,10 +203,22 @@ function Component()
 		const pwLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'pwLock.script')).map((o)=>o.pwLock.script));
 		const omniLockList = _.flatten(chainSpecs.filter((o)=>_.has(o, 'omniLock.script')).map((o: any)=>o.omniLock.script)); // "o: any" used to ignore erroneous error on missing o.omniLock.
 
+		// TODO: Revisit Omnilock lists in PW-Core.
+		const omniLockV1Mainnet = new Script('0xa4398768d87bd17aea1361edc3accd6a0117774dc4ebc813bfa173e8ac0d086d', '0x', HashType.type);
+		const omniLockV2Mainnet = new Script('0x9b819793a64463aed77c615d6cb226eea5487ccfc0783043a587254cda2b6f26', '0x', HashType.type);
+		const omniLockV1Testnet = new Script('0x79f90bb5e892d80dd213439eeab551120eb417678824f282b4ffb5f21bad2e1e', '0x', HashType.type);
+		const omniLockV2Testnet = new Script('0xf329effd1c475a2978453c8600e1eaf0bc2087ee093c3ee64cc96ec6847752cb', '0x', HashType.type);
+		omniLockList.push(omniLockV1Mainnet, omniLockV2Mainnet, omniLockV1Testnet, omniLockV2Testnet);
+		
 		// TODO: Add JoyId lock list to the chain specs of PW-Core.
 		const joyIdLockMainnet = new Script('0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323', '0x', HashType.type);
 		const joyIdLockTestnet = new Script('0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac', '0x', HashType.type);
 		const joyideLockList = [joyIdLockMainnet, joyIdLockTestnet];
+
+		// TODO: Add RGB++ lock list to the chain specs of PW-Core.
+		const rgbLockMainnet = new Script('0xbc6c568a1a0d0a09f6844dc9d74ddb4343c32143ff25f727c59edf4fb72d6936', '0x', HashType.type);
+		const rgbLockTestnet = new Script('0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248', '0x', HashType.type);
+		const rgbLockList = [rgbLockMainnet, rgbLockTestnet];
 
 		if(flag === AddressFlags.Acp)
 			return !!acpLockList.find((n)=>n.sameWith(lockScript));
@@ -219,6 +232,8 @@ function Component()
 			return !!pwLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.OmniLock)
 			return !!omniLockList.find((n)=>n.sameWith(lockScript));
+		if(flag === AddressFlags.RgbPpLock)
+			return !!rgbLockList.find((n)=>n.sameWith(lockScript));
 		if(flag === AddressFlags.Mainnet)
 			return (inputAddressType===AddressType.ckb) ? inputAddressPrefix==='ckb' : ChainTypes[chainType]==='mainnet';
 		if(flag === AddressFlags.Testnet)
@@ -341,19 +356,22 @@ function Component()
 							<Flag checked={getAddressFlag(AddressFlags.Acp)} /> <span className="label">ACP</span>
 						</label>
 						<label title="The Default lock is also known as the SECP256k1-Blake160-Sighash lock.">
-							<Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /> <span className="label">Default Lock</span>
+							<Flag checked={getAddressFlag(AddressFlags.DefaultLock)} /> <span className="label">Default</span>
 						</label>
 						<label title="The JoyId lock is used by the JoyID wallet.">
-							<Flag checked={getAddressFlag(AddressFlags.JoyIdLock)} /> <span className="label">JoyId Lock</span>
+							<Flag checked={getAddressFlag(AddressFlags.JoyIdLock)} /> <span className="label">JoyId</span>
 						</label>
 						<label title="The Multi-Sig lock is also known as the SECP256k1-Blake160-MultiSig lock.">
-							<Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /> <span className="label">Multi-Sig Lock</span>
+							<Flag checked={getAddressFlag(AddressFlags.MultiSigLock)} /> <span className="label">Multi-Sig</span>
 						</label>
 						<label title="PW-Lock is used for compatibility with wallets from other chains, such as MetaMask. Usage of PW-Lock is deprecated.">
 							<Flag checked={getAddressFlag(AddressFlags.PwLock)} /> <span className="label">PW-Lock</span>
 						</label>
 						<label title="Omni Lock is used for compatibility with wallets from other chains, such as MetaMask. Omni Lock is the replacement for PW-Lock.">
-							<Flag checked={getAddressFlag(AddressFlags.OmniLock)} /> <span className="label">Omni Lock</span>
+							<Flag checked={getAddressFlag(AddressFlags.OmniLock)} /> <span className="label">Omni</span>
+						</label>
+						<label title="RGB++ Lock is used for isomorphic binding between BTC and CKB.">
+							<Flag checked={getAddressFlag(AddressFlags.RgbPpLock)} /> <span className="label">RGB++</span>
 						</label>
 					</fieldset>
 					<fieldset>
