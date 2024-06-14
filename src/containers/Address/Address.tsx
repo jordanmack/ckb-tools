@@ -368,7 +368,7 @@ function Component()
 							<Flag checked={getAddressFlag(AddressFlags.PwLock)} /> <span className="label">PW-Lock</span>
 						</label>
 						<label title="Omni Lock is used for compatibility with wallets from other chains, such as MetaMask. Omni Lock is the replacement for PW-Lock.">
-							<Flag checked={getAddressFlag(AddressFlags.OmniLock)} /> <span className="label">Omni</span>
+							<Flag checked={getAddressFlag(AddressFlags.OmniLock)} /> <span className="label">Omnilock</span>
 						</label>
 						<label title="RGB++ Lock is used for isomorphic binding between BTC and CKB.">
 							<Flag checked={getAddressFlag(AddressFlags.RgbPpLock)} /> <span className="label">RGB++</span>
